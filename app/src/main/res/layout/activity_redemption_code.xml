@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/bg_primary">
+
+    <!-- Pro 状态显示 -->
+    <TextView
+        android:id="@+id/proStatusText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="❌ Pro 服务未激活"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:padding="16dp"
+        android:background="@android:color/white"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 说明文字 -->
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="请输入兑换码激活 Pro 服务"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/proStatusText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 兑换码输入框 -->
+    <EditText
+        android:id="@+id/codeInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="请输入兑换码（例如：ABC123-XYZ456-789）"
+        android:textSize="16sp"
+        android:padding="16dp"
+        android:background="@android:color/white"
+        android:inputType="textCapCharacters"
+        android:maxLines="1"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/proStatusText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.1" />
+
+    <!-- 验证按钮 -->
+    <Button
+        android:id="@+id/verifyButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="验证兑换码"
+        android:textSize="16sp"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintTop_toBottomOf="@id/codeInput"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 激活按钮 -->
+    <Button
+        android:id="@+id/activateButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="激活 Pro 服务"
+        android:textSize="16sp"
+        android:padding="12dp"
+        android:enabled="false"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/verifyButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 状态文本 -->
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="14sp"
+        android:padding="12dp"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/activateButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 说明文字 -->
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="提示：\n1. 兑换码可在其他平台购买\n2. 每个兑换码只能使用一次\n3. 激活后 Pro 服务将立即生效"
+        android:textSize="12sp"
+        android:textColor="@android:color/darker_gray"
+        android:padding="16dp"
+        android:lineSpacingExtra="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@android:color/white">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:paddingBottom="64dp">
+
+    <!-- 提示（正面） -->
+    <TextView
+        android:id="@+id/frontLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="正面"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:id="@+id/frontContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:layout_marginBottom="24dp">
+
+        <EditText
+            android:id="@+id/frontEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="输入提示..."
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:maxLines="10"
+            android:padding="12dp"
+            android:background="@android:drawable/edit_text"
+            android:textColor="#212121"
+            android:textColorHint="#9E9E9E"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="8dp">
+
+            <Button
+                android:id="@+id/frontImageButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="添加图片"
+                android:textSize="14sp"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp" />
+
+            <ImageView
+                android:id="@+id/frontImageView"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="8dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:background="@android:drawable/picture_frame" />
+
+            <Button
+                android:id="@+id/frontImageDeleteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="删除"
+                android:textSize="14sp"
+                android:padding="12dp"
+                android:layout_marginStart="8dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 内容（背面） -->
+    <TextView
+        android:id="@+id/backLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="背面"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:id="@+id/backContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:layout_marginBottom="24dp">
+
+        <EditText
+            android:id="@+id/backEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="150dp"
+            android:hint="输入内容..."
+            android:inputType="textMultiLine"
+            android:gravity="top|start"
+            android:minLines="5"
+            android:maxLines="15"
+            android:padding="12dp"
+            android:background="@android:drawable/edit_text"
+            android:textColor="#212121"
+            android:textColorHint="#9E9E9E"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="8dp">
+
+            <Button
+                android:id="@+id/backImageButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="添加图片"
+                android:textSize="14sp"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp" />
+
+            <ImageView
+                android:id="@+id/backImageView"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="8dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:background="@android:drawable/picture_frame" />
+
+            <Button
+                android:id="@+id/backImageDeleteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="删除"
+                android:textSize="14sp"
+                android:padding="12dp"
+                android:layout_marginStart="8dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 卡包 -->
+    <TextView
+        android:id="@+id/deckLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="卡包"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/deckEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="选择卡包（可选）"
+        android:inputType="none"
+        android:focusable="false"
+        android:clickable="true"
+        android:padding="12dp"
+        android:background="@android:drawable/edit_text"
+        android:textColor="#212121"
+        android:textColorHint="#9E9E9E"
+        android:textSize="16sp"
+        android:layout_marginBottom="24dp" />
+
+    <!-- 标签 -->
+    <TextView
+        android:id="@+id/tagsLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="标签"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/tagsEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="点击选择标签"
+        android:inputType="none"
+        android:focusable="false"
+        android:clickable="true"
+        android:padding="12dp"
+        android:background="@android:drawable/edit_text"
+        android:textColor="#212121"
+        android:textColorHint="#9E9E9E"
+        android:textSize="16sp"
+        android:layout_marginBottom="32dp" />
+
+</LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

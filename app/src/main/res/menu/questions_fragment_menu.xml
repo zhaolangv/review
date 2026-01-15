@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    
+    <item
+        android:id="@+id/action_camera_capture"
+        android:title="拍照"
+        android:icon="@android:drawable/ic_menu_camera"
+        app:showAsAction="ifRoom" />
+    
+    <item
+        android:id="@+id/action_manual_import"
+        android:title="手动导入"
+        android:icon="@android:drawable/ic_menu_gallery"
+        app:showAsAction="ifRoom" />
+    
+    <item
+        android:id="@+id/action_rescan"
+        android:title="重新扫描"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="ifRoom" />
+    
+    <item
+        android:id="@+id/action_clear_all"
+        android:title="清空所有"
+        android:icon="@android:drawable/ic_menu_delete"
+        app:showAsAction="never" />
+    
+    <item
+        android:id="@+id/action_sort_time"
+        android:title="按时间排序"
+        app:showAsAction="never" />
+    
+    <item
+        android:id="@+id/action_sort_tag"
+        android:title="按标签排序"
+        app:showAsAction="never" />
+    
+    <item
+        android:id="@+id/action_batch_tag"
+        android:title="批量操作"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="ifRoom" />
+    
+    <item
+        android:id="@+id/action_review"
+        android:title="复习"
+        android:icon="@android:drawable/ic_menu_view"
+        app:showAsAction="ifRoom" />
+    
+</menu>
+

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_add_flashcard"
+        android:title="添加卡片"
+        android:icon="@android:drawable/ic_input_add"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_batch_tag"
+        android:title="批量操作"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_sort_time"
+        android:title="按更新时间"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_sort_create_time"
+        android:title="按创建时间"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_sort_tag"
+        android:title="按标签"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_export"
+        android:title="导出"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_import"
+        android:title="导入"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_deck_manage"
+        android:title="卡包管理"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        app:showAsAction="ifRoom" />
+
+</menu>
+

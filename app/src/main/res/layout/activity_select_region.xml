@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <!-- 框选区域 -->
+    <com.gongkao.cuotifupan.ui.RegionSelectView
+        android:id="@+id/regionSelectView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 顶部提示 -->
+    <TextView
+        android:id="@+id/hintText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="60dp"
+        android:padding="16dp"
+        android:text="拖动框选要截取的区域"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textAlignment="center"
+        android:background="#80000000" />
+
+    <!-- 底部按钮 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:layout_marginBottom="32dp"
+        android:background="#80000000">
+
+        <Button
+            android:id="@+id/btnCancelRegion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="取消"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#666666" />
+
+        <Button
+            android:id="@+id/btnConfirmRegion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="确认截图"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#007AFF" />
+
+    </LinearLayout>
+
+</FrameLayout>
+

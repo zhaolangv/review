@@ -1,0 +1,28 @@
+{
+  "weights": {
+    "numTextBlocks": 0.05,
+    "numLines": 0.05,
+    "avgLineLength": 0.05,
+    "shortLineRatio": 0.08,
+    "optionMarkerCount": 0.15,
+    "bboxVerticalAlignmentScore": 0.12,
+    "ocrConfidenceMean": 0.05,
+    "emojiOrPunctRatio": 0.05,
+    "hasQuestionKeywords": 0.15,
+    "hasMathSymbols": 0.03,
+    "topHalfLongLineRatio": 0.08,
+    "bottomHalfShortLines": 0.10,
+    "hasAlternativeMarkers": 0.03,
+    "hasSeparatorMarkers": 0.02
+  },
+  "thresholds": {
+    "auto": 70.0,
+    "confirm": 40.0
+  },
+  "description": {
+    "auto": "分数 >= 70，自动加入题库",
+    "confirm": "分数 >= 40，弹窗确认",
+    "ignore": "分数 < 40，忽略"
+  }
+}
+

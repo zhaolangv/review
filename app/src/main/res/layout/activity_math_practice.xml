@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#E8F5E9">
+
+    <!-- 顶部信息栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="@android:color/white"
+        android:elevation="4dp">
+
+        <TextView
+            android:id="@+id/questionNumberText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="1/10"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/timerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0:00:00"
+            android:textSize="16sp"
+            android:textColor="#4CAF50" />
+
+    </LinearLayout>
+
+    <!-- 题目区域 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp">
+
+        <TextView
+            android:id="@+id/questionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="63-33="
+            android:textSize="48sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black" />
+
+        <EditText
+            android:id="@+id/answerInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text=""
+            android:textSize="36sp"
+            android:textColor="#2196F3"
+            android:minWidth="200dp"
+            android:gravity="center"
+            android:background="@android:color/transparent"
+            android:inputType="numberSigned|numberDecimal"
+            android:imeOptions="actionDone"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <TextView
+            android:id="@+id/hintText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="建议写到小数点后2~3位\n允许误差范围:±2%"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            android:gravity="center"
+            android:visibility="gone" />
+
+        <!-- 比较按钮（大于/小于）- 用于比较题 -->
+        <LinearLayout
+            android:id="@+id/compareButtonsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="24dp"
+            android:visibility="gone"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/greaterButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="大于"
+                android:layout_marginEnd="16dp"
+                android:minHeight="44dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <Button
+                android:id="@+id/lessButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="小于"
+                android:layout_marginStart="16dp"
+                android:minHeight="44dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
+        <!-- 选项按钮（A/B）- 用于选择题 -->
+        <LinearLayout
+            android:id="@+id/optionButtonsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="24dp"
+            android:visibility="gone"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/optionAButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="A"
+                android:layout_marginEnd="16dp"
+                android:minHeight="44dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <Button
+                android:id="@+id/optionBButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="B"
+                android:layout_marginStart="16dp"
+                android:minHeight="44dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+        
+        </LinearLayout>
+        
+        <!-- 装饰图片（数学练习专用） -->
+        <ImageView
+            android:id="@+id/decorImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/decor_side_chiikawa_1"
+            android:scaleType="fitCenter"
+            android:alpha="0.3"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="装饰图标" />
+        
+    </FrameLayout>
+
+    <!-- 操作按钮 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/restartButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="重开"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/confirmButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="确定"
+            android:backgroundTint="#5B8DEF"
+            android:textColor="#FFFFFF"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+    <!-- 自定义键盘 -->
+    <LinearLayout
+        android:id="@+id/keyboardWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#C8E6C9"
+        android:padding="8dp">
+
+        <!-- 功能按钮行 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/clearButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="清空"
+                android:layout_margin="4dp" />
+
+            <Button
+                android:id="@+id/backspaceButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="退格"
+                android:layout_margin="4dp" />
+
+        </LinearLayout>
+
+        <!-- 数字键盘 -->
+        <LinearLayout
+            android:id="@+id/keyboardContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </LinearLayout>
+
+</LinearLayout>
+

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:minHeight="300dp">
+
+    <!-- 正面（提示） -->
+    <FrameLayout
+        android:id="@+id/flashcardFront"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- 内容区域（居中） -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="32dp"
+                android:gravity="center"
+                android:minHeight="300dp"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/flashcardFrontText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212121"
+                    android:textSize="20sp"
+                    android:textAlignment="center"
+                    android:text="提示内容" />
+
+                <ImageView
+                    android:id="@+id/flashcardFrontImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"
+                    android:contentDescription="正面图片" />
+
+            </LinearLayout>
+        </ScrollView>
+
+    </FrameLayout>
+
+    <!-- 背面（内容） -->
+    <FrameLayout
+        android:id="@+id/flashcardBack"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- 内容区域（居中） -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="32dp"
+                android:gravity="center"
+                android:minHeight="300dp"
+                android:layout_gravity="center">
+
+                <TextView
+                    android:id="@+id/flashcardBackText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212121"
+                    android:textSize="18sp"
+                    android:textAlignment="center"
+                    android:text="记忆内容" />
+
+                <ImageView
+                    android:id="@+id/flashcardBackImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"
+                    android:contentDescription="背面图片" />
+
+            </LinearLayout>
+        </ScrollView>
+
+    </FrameLayout>
+
+</FrameLayout>

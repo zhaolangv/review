@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- 相机权限 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    
+    <!-- 读取外部存储/相册权限 (Android 13+使用READ_MEDIA_IMAGES) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    
+    <!-- 写入外部存储权限 (Android 10及以下需要，Android 11+受Scoped Storage限制) -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29"
+        tools:ignore="ScopedStorage" />
+    
+    <!-- Android 11+ 管理所有文件访问权限（可选，需要特殊申请） -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    
+    
+    <!-- 网络权限 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- 悬浮窗权限 -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    
+    <!-- 前台服务权限 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+
+    <application
+        android:name=".SnapReviewApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyApplication"
+        tools:targetApi="31">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.QuestionDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.QuestionDetailCardActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ui.ImageFullscreenWithNotesActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Fullscreen"
+            android:parentActivityName=".ui.QuestionDetailCardActivity" />
+
+        <activity
+            android:name=".ui.ScreenHandwritingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.HandwritingNoteActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.ManualImportActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.ImageFullscreenActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Fullscreen"
+            android:parentActivityName=".ui.ManualImportActivity" />
+
+        <activity
+            android:name=".ui.ImageEditActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.QuestionDetailActivity" />
+
+        <activity
+            android:name=".ui.QuestionConfirmDialogActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Transparent"
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true"
+            android:taskAffinity="" />
+
+        <activity
+            android:name=".ui.FlashcardReviewActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:launchMode="standard" />
+
+        <activity
+            android:name=".ui.QuestionReviewActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.practice.MathPracticeActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.practice.MathPracticeResultActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.practice.MathPracticeActivity" />
+
+        <activity
+            android:name=".ui.practice.MathPracticeHistoryActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.NotesListActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.NoteEditActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.NotesListActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.FlashcardsListActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.FlashcardEditActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:launchMode="standard" />
+
+        <activity
+            android:name=".ui.DeckManageActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.CameraCaptureActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.RedemptionCodeActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.HowToGetRedeemCodeActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.DataMigrationActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <!-- 区域选择Activity（全屏透明） -->
+        <activity
+            android:name=".ui.SelectRegionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Transparent.Fullscreen"
+            android:excludeFromRecents="true"
+            android:taskAffinity="" />
+
+        <!-- 屏幕截图权限请求Activity（透明） -->
+        <activity
+            android:name=".ui.ScreenCaptureActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Transparent"
+            android:excludeFromRecents="true"
+            android:taskAffinity="" />
+
+        <!-- 截图框选Activity -->
+        <activity
+            android:name=".ui.CropScreenshotActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Fullscreen" />
+
+        <!-- 悬浮窗服务（只显示悬浮按钮，不需要mediaProjection权限） -->
+        <service
+            android:name=".service.FloatingCaptureService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="floatingWindow" />
+        </service>
+        
+        <!-- 截图服务（用于执行MediaProjection截图） -->
+        <service
+            android:name=".service.ScreenCaptureService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
+
+        <!-- FileProvider for camera capture (Android 7.0+) -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+    </application>
+
+</manifest>

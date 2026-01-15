@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/bg_primary">
+
+    <!-- 标题 -->
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="数据迁移"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:padding="16dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Tab 切换 -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintTop_toBottomOf="@id/titleText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 导出页面 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/exportLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/tabLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/exportDescriptionText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="导出当前设备的所有数据（题目、笔记、记忆卡片），生成迁移码。\n\n⚠️ 重要提示：\n• 迁移码只能使用一次\n• 数据保留1天后自动删除\n• 请在有效期内使用迁移码"
+            android:textSize="14sp"
+            android:padding="16dp"
+            android:background="@android:color/white"
+            android:layout_marginBottom="24dp"
+            android:lineSpacingExtra="4dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <Button
+            android:id="@+id/exportButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="开始导出"
+            android:textSize="16sp"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintTop_toBottomOf="@id/exportDescriptionText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/exportProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/exportButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/exportProgressText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="14sp"
+            android:padding="16dp"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/exportProgressBar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/exportResultCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginTop="24dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            app:layout_constraintTop_toBottomOf="@id/exportProgressText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/exportResultTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="✅ 导出成功！"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/exportResultCodeLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="迁移码："
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/migrationCodeLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/white"
+                    android:padding="12dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/exportResultCode"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="monospace"
+                        android:selectAllOnFocus="true"
+                        android:textIsSelectable="true"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/copyCodeButton"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                    <ImageButton
+                        android:id="@+id/copyCodeButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_copy"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="复制迁移码"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/exportResultExpiresLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="过期时间："
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/exportResultExpires"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:background="@android:color/white"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/exportResultHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="请在另一台设备上输入此迁移码导入数据。\n\n⚠️ 迁移码只能使用一次，数据保留1天后自动删除。"
+                    android:textSize="12sp"
+                    android:gravity="center"
+                    android:textColor="@android:color/darker_gray" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 导入页面 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/importLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tabLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/importDescriptionText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="输入从另一台设备获取的迁移码，即可导入所有数据。\n\n⚠️ 重要提示：\n• 迁移码只能使用一次\n• 数据保留1天后自动删除\n• 请确保迁移码在有效期内"
+            android:textSize="14sp"
+            android:padding="16dp"
+            android:background="@android:color/white"
+            android:layout_marginBottom="24dp"
+            android:lineSpacingExtra="4dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <EditText
+            android:id="@+id/migrationCodeInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="请输入迁移码（格式：MIGR-XXXXXX-XXXXXX-XXX）"
+            android:textSize="16sp"
+            android:padding="16dp"
+            android:background="@android:color/white"
+            android:inputType="text"
+            android:maxLines="1"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintTop_toBottomOf="@id/importDescriptionText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <Button
+            android:id="@+id/importButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="开始导入"
+            android:textSize="16sp"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintTop_toBottomOf="@id/migrationCodeInput"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/importProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/importButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/importProgressText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="14sp"
+            android:padding="16dp"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/importProgressBar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/importResultText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="16sp"
+            android:padding="16dp"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@id/importProgressText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

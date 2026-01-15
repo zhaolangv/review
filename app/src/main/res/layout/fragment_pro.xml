@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/bg_primary">
+
+    <!-- Pro 状态显示 -->
+    <TextView
+        android:id="@+id/proStatusText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="❌ Pro 服务未激活"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:padding="24dp"
+        android:background="@android:color/white"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:lineSpacingExtra="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 设备ID显示 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/deviceIdCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        app:layout_constraintTop_toBottomOf="@id/proStatusText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📱 设备ID"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                
+                <TextView
+                    android:id="@+id/deviceIdText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="获取中..."
+                    android:textSize="12sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:fontFamily="monospace"
+                    android:selectAllOnFocus="false"
+                    android:isScrollContainer="true"
+                    android:scrollbars="horizontal" />
+                
+                <ImageButton
+                    android:id="@+id/copyDeviceIdButton"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_copy"
+                    android:contentDescription="复制设备ID"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- 当前周期配额显示 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/currentPeriodCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/deviceIdCard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📅 当前周期"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+            
+            <TextView
+                android:id="@+id/quotaText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📊 配额信息将在首次使用手写擦除功能时更新"
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+    
+    <!-- 下一周期预付费配额显示 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/nextPeriodCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="#E8F5E9"
+        app:layout_constraintTop_toBottomOf="@id/currentPeriodCard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+                
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="🎁 下一周期已预付费"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+                
+                <TextView
+                    android:id="@+id/autoActivateBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="自动激活"
+                    android:textSize="12sp"
+                    android:textColor="#4CAF50"
+                    android:background="#FFFFFF"
+                    android:padding="4dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp" />
+            </LinearLayout>
+            
+            <TextView
+                android:id="@+id/nextPeriodQuotaText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- 激活按钮 -->
+    <Button
+        android:id="@+id/activateButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="激活 Pro 服务"
+        android:textSize="16sp"
+        android:padding="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/currentPeriodCard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 数据迁移按钮 -->
+    <Button
+        android:id="@+id/migrationButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="数据迁移"
+        android:textSize="16sp"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/activateButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 高级功能卡片 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/advancedFeaturesCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        app:layout_constraintTop_toBottomOf="@id/migrationButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔧 高级功能"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+            
+            <!-- 悬浮截图开关 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+                
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📷 悬浮快捷入口"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="在其他应用做题时快速跳转导入页面"
+                        android:textSize="12sp"
+                        android:textColor="@android:color/darker_gray" />
+                </LinearLayout>
+                
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/floatingCaptureSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            
+            <!-- 分隔线 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"
+                android:layout_marginBottom="12dp" />
+            
+            <!-- 功能说明 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="💡 新功能说明：\n• 图片标注支持图层功能，可清除重做\n• 笔记输入支持手写识别\n• 悬浮按钮可快速跳转到导入页面"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray"
+                android:lineSpacingExtra="4dp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

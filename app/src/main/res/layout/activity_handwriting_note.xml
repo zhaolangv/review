@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <!-- 顶部工具栏容器（圆角背景，可横向滚动） -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/toolbarContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="#F5F5F5"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:fadeScrollbars="false"
+            android:fillViewport="false">
+
+            <LinearLayout
+                android:id="@+id/toolbar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:gravity="center_vertical">
+
+            <!-- 返回 -->
+        <ImageButton
+            android:id="@+id/btnBack"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="返回"
+                android:padding="6dp" />
+
+            <!-- 撤销 -->
+        <ImageButton
+            android:id="@+id/btnUndo"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+            android:src="@drawable/ic_undo"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="撤销"
+                android:padding="6dp"
+            android:layout_marginStart="4dp" />
+
+            <!-- 重做 -->
+        <ImageButton
+            android:id="@+id/btnRedo"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+            android:src="@drawable/ic_redo"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="重做"
+                android:padding="6dp"
+            android:layout_marginStart="4dp" />
+
+            <!-- 清除 -->
+        <ImageButton
+            android:id="@+id/btnClear"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+            android:src="@android:drawable/ic_menu_delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="清除"
+                android:padding="6dp"
+                android:layout_marginStart="4dp" />
+
+            <!-- 分隔线 -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:background="#CCCCCC"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp" />
+
+            <!-- 画笔 -->
+        <ImageButton
+            android:id="@+id/btnPen"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+            android:src="@android:drawable/ic_menu_edit"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="画笔"
+                android:padding="6dp"
+                android:layout_marginStart="4dp" />
+
+            <!-- 橡皮擦 -->
+        <ImageButton
+                android:id="@+id/btnEraserBottom"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+            android:src="@drawable/ic_eraser"
+            android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="橡皮擦"
+                android:padding="6dp"
+                android:layout_marginStart="4dp" />
+
+            <!-- 套索 -->
+        <ImageButton
+                android:id="@+id/btnLassoBottom"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+            android:src="@android:drawable/ic_menu_crop"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="套索"
+                android:padding="6dp"
+                android:layout_marginStart="4dp" />
+
+
+            <!-- 分隔线 -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:background="#CCCCCC"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp" />
+
+            <!-- 笔触开关 -->
+            <ImageButton
+                android:id="@+id/btnPencilToggle"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_pencil_toggle"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="笔触开关"
+                android:padding="6dp"
+                android:layout_marginStart="4dp" />
+
+            <!-- 实时美化开关 -->
+            <ImageButton
+                android:id="@+id/btnBeautifyToggle"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@android:drawable/ic_menu_sort_by_size"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="实时美化"
+                android:padding="6dp"
+                android:layout_marginStart="4dp" />
+
+            <!-- 图层 -->
+            <ImageButton
+                android:id="@+id/btnLayer"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@android:drawable/ic_menu_agenda"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="图层"
+                android:padding="6dp"
+                android:layout_marginStart="4dp" />
+
+            <!-- 模式切换 -->
+            <ImageButton
+                android:id="@+id/btnModeToggle"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+            android:src="@android:drawable/ic_menu_rotate"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="模式切换"
+                android:padding="6dp"
+                android:layout_marginStart="4dp" />
+
+            <!-- 分隔线 -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:background="#CCCCCC"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp" />
+
+            <!-- 字体按钮 -->
+            <ImageButton
+                android:id="@+id/btnFont"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_font"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="字体"
+                android:padding="6dp"
+                android:layout_marginStart="4dp" />
+
+    </LinearLayout>
+    
+        </HorizontalScrollView>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- 题目图片显示（书写模式使用） -->
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/questionImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/toolbarContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone" />
+
+    <!-- 题目图片显示（查看模式使用，普通ImageView以便完全控制变换） -->
+    <ImageView
+        android:id="@+id/questionImageViewReplacement"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/white"
+        android:scaleType="matrix"
+        app:layout_constraintTop_toBottomOf="@id/toolbarContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone" />
+
+    <!-- 无限画布（覆盖在图片上，透明背景） -->
+    <com.gongkao.cuotifupan.ui.InfiniteCanvasView
+        android:id="@+id/canvasView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toBottomOf="@id/toolbarContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- 顶部面板容器（图层面板和选项面板，浮动在画布上方） -->
+    <FrameLayout
+        android:id="@+id/bottomPanelsContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbarContainer"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone">
+
+    <!-- 图层面板（可展开/收起） -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/layerPanel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@android:color/white"
+            android:maxHeight="300dp"
+            android:minWidth="200dp"
+        android:visibility="gone">
+
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+            android:orientation="vertical"
+                android:padding="8dp"
+                android:minWidth="200dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="图层"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageButton
+                    android:id="@+id/btnAddLayer"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@android:drawable/ic_input_add"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="添加图层"
+                    android:padding="8dp"
+                        android:layout_marginEnd="8dp" />
+
+                <ImageButton
+                    android:id="@+id/btnRemoveLayer"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@android:drawable/ic_menu_delete"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="删除图层"
+                    android:padding="8dp" />
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/layerListView"
+                android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxHeight="250dp" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- 顶部选项面板（用于套索形状和橡皮擦大小选择） -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/optionPanel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@android:color/white"
+            android:maxHeight="300dp"
+            android:minWidth="180dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:minWidth="180dp">
+
+                <TextView
+                    android:id="@+id/optionPanelTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="选项"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp" />
+
+                <LinearLayout
+                    android:id="@+id/lassoModeOptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:minWidth="180dp">
+
+                    <Button
+                        android:id="@+id/btnLassoFreehand"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="自由形状"
+                        android:layout_marginBottom="4dp"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#666666"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp" />
+
+                    <Button
+                        android:id="@+id/btnLassoRectangle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="矩形"
+                        android:layout_marginBottom="4dp"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#666666"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp" />
+
+                    <Button
+                        android:id="@+id/btnLassoCircle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="圆形"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#666666"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/eraserSizeOptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <Button
+                        android:id="@+id/btnEraserSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="细 (10)"
+                        android:layout_marginBottom="4dp"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#666666"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp" />
+
+                    <Button
+                        android:id="@+id/btnEraserMedium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="中 (20)"
+                        android:layout_marginBottom="4dp"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#666666"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp" />
+
+                    <Button
+                        android:id="@+id/btnEraserLarge"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="粗 (40)"
+                        android:layout_marginBottom="4dp"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#666666"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp" />
+
+                    <Button
+                        android:id="@+id/btnEraserXLarge"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="很粗 (60)"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#666666"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fontOptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <Button
+                        android:id="@+id/btnFontRegular"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="常规"
+                        android:layout_marginBottom="4dp"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#666666"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp" />
+
+                    <Button
+                        android:id="@+id/btnFontBold"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="粗体"
+                        android:layout_marginBottom="4dp"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#666666"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp" />
+
+                    <Button
+                        android:id="@+id/btnFontElegant"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="优雅"
+                        android:layout_marginBottom="4dp"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#666666"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp" />
+
+                    <Button
+                        android:id="@+id/btnFontCalligraphy"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="书法"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/white"
+                        android:backgroundTint="#666666"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp" />
+
+                </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

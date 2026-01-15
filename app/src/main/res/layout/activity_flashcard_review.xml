@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/bg_primary">
+
+    <!-- 状态文本 -->
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1 / 10"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+    
+    <!-- 统计信息 -->
+    <TextView
+        android:id="@+id/statsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="新: 0 | 学习: 0 | 复习: 0"
+        android:textSize="12sp"
+        android:textColor="@android:color/darker_gray"
+        app:layout_constraintTop_toBottomOf="@id/statusText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 记忆卡片 ViewPager -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/flashcardViewPager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/statsText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/buttonContainer" />
+
+    <!-- 按钮容器（Anki 风格：四个难度按钮） -->
+    <LinearLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Again 按钮（再次/忘记） -->
+        <Button
+            android:id="@+id/againButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="再次"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#F44336"
+            android:minHeight="48dp" />
+
+        <!-- Hard 按钮（困难） -->
+        <Button
+            android:id="@+id/hardButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:text="困难"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#FF9800"
+            android:minHeight="48dp" />
+
+        <!-- Good 按钮（良好） -->
+        <Button
+            android:id="@+id/goodButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:text="良好"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#2196F3"
+            android:minHeight="48dp" />
+
+        <!-- Easy 按钮（简单） -->
+        <Button
+            android:id="@+id/easyButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="简单"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#4CAF50"
+            android:minHeight="48dp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:clickable="false"
+        android:focusable="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- 题目数量选择 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp"
+                android:background="@android:color/white"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="题目数量:"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="16dp" />
+
+                <EditText
+                    android:id="@+id/questionCountEditText"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="10"
+                    android:textSize="16sp"
+                    android:padding="8dp" />
+
+            </LinearLayout>
+
+            <!-- 练习类型选择 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="选择练习类型："
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <!-- 练习类型容器 -->
+            <LinearLayout
+                android:id="@+id/practiceTypeContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@android:color/white"
+                android:padding="8dp">
+
+                <!-- 练习类型列表（占据全宽） -->
+                <LinearLayout
+                    android:id="@+id/practiceTypeList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <!-- 装饰图片（放在练习项目下面） -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/decorImageView"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:src="@drawable/decor_math_practice_chiikawa"
+                        android:scaleType="fitCenter"
+                        android:alpha="0.5"
+                        android:layout_marginEnd="16dp"
+                        android:contentDescription="装饰图标" />
+                    
+                    <ImageView
+                        android:id="@+id/bottomDecorImageView"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:src="@drawable/decor_bottom_chiikawa_1"
+                        android:scaleType="fitCenter"
+                        android:alpha="0.3"
+                        android:contentDescription="底部装饰图标" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- 操作按钮（固定在底部） -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="@android:color/white"
+        android:elevation="4dp">
+
+        <Button
+            android:id="@+id/startPracticeButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="开始练习"
+            android:textSize="16sp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="#4CAF50"
+            android:clickable="true"
+            android:focusable="true"
+            android:enabled="true" />
+
+        <Button
+            android:id="@+id/viewHistoryButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="练习历史"
+            android:textSize="16sp"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#2196F3"
+            android:clickable="true"
+            android:focusable="true"
+            android:enabled="true" />
+
+    </LinearLayout>
+
+</LinearLayout>
+

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- iOS风格色系 -->
+    <!-- 主色调 -->
+    <color name="ios_blue">#007AFF</color>
+    <color name="ios_blue_dark">#0051D5</color>
+    <color name="ios_green">#34C759</color>
+    <color name="ios_green_dark">#28A745</color>
+    <color name="ios_red">#FF3B30</color>
+    <color name="ios_red_dark">#D32F2F</color>
+    <color name="ios_orange">#FF9500</color>
+    <color name="ios_orange_dark">#F57C00</color>
+    <color name="ios_purple">#AF52DE</color>
+    <color name="ios_purple_dark">#9C27B0</color>
+    
+    <!-- 背景色 -->
+    <color name="ios_bg_light">#F2F2F7</color>
+    <color name="ios_bg_primary">#F2F2F7</color>
+    <color name="ios_bg_card">#FFFFFF</color>
+    <color name="ios_bg_card_alt">#F9F9F9</color>
+    
+    <!-- 文字颜色 -->
+    <color name="ios_text_primary">#000000</color>
+    <color name="ios_text_secondary">#8E8E93</color>
+    <color name="ios_text_dark">#000000</color>
+    
+    <!-- 按钮颜色 -->
+    <color name="ios_button_primary">#007AFF</color>
+    <color name="ios_button_secondary">#5AC8FA</color>
+    <color name="ios_button_success">#34C759</color>
+    <color name="ios_button_danger">#FF3B30</color>
+    
+    <!-- 简化颜色名称（用于布局文件） -->
+    <color name="bg_primary">@color/ios_bg_primary</color>
+    <color name="bg_card">@color/ios_bg_card</color>
+    <color name="bg_card_alt">@color/ios_bg_card_alt</color>
+    <color name="text_primary">@color/ios_text_primary</color>
+    <color name="text_secondary">@color/ios_text_secondary</color>
+    <color name="text_dark">@color/ios_text_dark</color>
+    <color name="button_primary">@color/ios_button_primary</color>
+    <color name="button_secondary">@color/ios_button_secondary</color>
+    <color name="button_success">@color/ios_button_success</color>
+    <color name="button_danger">@color/ios_button_danger</color>
+    <color name="blue_dark">@color/ios_blue_dark</color>
+    
+    <!-- 兼容旧颜色 -->
+    <color name="purple_200">#007AFF</color>
+    <color name="purple_500">#007AFF</color>
+    <color name="purple_700">#0051D5</color>
+    <color name="teal_200">#5AC8FA</color>
+    <color name="teal_700">#007AFF</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+</resources>

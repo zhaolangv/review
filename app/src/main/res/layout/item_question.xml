@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@color/bg_card">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <!-- 选择框（批量模式时显示） -->
+        <CheckBox
+            android:id="@+id/selectionCheckBox"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="8dp" />
+
+        <ImageView
+            android:id="@+id/questionThumbnail"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toEndOf="@id/selectionCheckBox"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:contentDescription="题目缩略图" />
+
+        <!-- 标签容器 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tagsRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintEnd_toStartOf="@id/decorImageView"
+            app:layout_constraintStart_toEndOf="@id/questionThumbnail"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 右上角装饰图片（题目专用） -->
+        <ImageView
+            android:id="@+id/decorImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/decor_question_chiikawa"
+            android:scaleType="fitCenter"
+            android:alpha="0.6"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="装饰图标" />
+
+        <!-- 笔记显示（中间） -->
+        <TextView
+            android:id="@+id/notesPreviewText"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="4dp"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:lineSpacingExtra="4dp"
+            android:maxLines="3"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/questionThumbnail"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tagsRecyclerView"
+            app:layout_constraintBottom_toTopOf="@id/timeText"
+            android:text="笔记预览..." />
+
+        <!-- 时间和状态（底部，对齐图片下边缘） -->
+        <TextView
+            android:id="@+id/timeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            app:layout_constraintStart_toEndOf="@id/questionThumbnail"
+            app:layout_constraintBottom_toBottomOf="@id/questionThumbnail"
+            android:text="12-01 14:30" />
+
+        <TextView
+            android:id="@+id/reviewStateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textColor="@color/blue_dark"
+            android:textSize="12sp"
+            app:layout_constraintBaseline_toBaselineOf="@id/timeText"
+            app:layout_constraintStart_toEndOf="@id/timeText"
+            android:text="未复盘" />
+
+        <TextView
+            android:id="@+id/questionTypeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:textColor="@android:color/white"
+            android:textSize="10sp"
+            android:background="@drawable/bg_question_type"
+            app:layout_constraintBaseline_toBaselineOf="@id/timeText"
+            app:layout_constraintStart_toEndOf="@id/reviewStateText"
+            android:text="文字题"
+            android:visibility="gone" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
+

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">公考错题复盘</string>
+    
+    <!-- 主界面 -->
+    <string name="monitoring">监听中</string>
+    <string name="not_monitoring">未启动</string>
+    <string name="empty_questions">还没有题目\n截图或保存题目图片试试吧</string>
+    
+    <!-- 菜单 -->
+    <string name="menu_settings">设置</string>
+    <string name="menu_rescan">重新扫描</string>
+    <string name="menu_clear_all">清空题库</string>
+    
+    <!-- 设置 -->
+    <string name="settings_title">设置</string>
+    <string name="settings_monitoring">自动监听</string>
+    <string name="settings_monitoring_summary">自动检测新图片中的题目</string>
+    <string name="settings_scan_count">扫描数量</string>
+    <string name="settings_scan_count_summary">首次启动扫描的历史图片数量</string>
+    <string name="settings_confidence">识别灵敏度</string>
+    <string name="settings_confidence_summary">越高越严格，越低越宽松</string>
+    
+    <!-- 通知 -->
+    <string name="notification_scanning">正在扫描相册...</string>
+    <string name="notification_scan_complete">扫描完成</string>
+    <string name="notification_found_questions">发现 %d 道题目</string>
+    
+    <!-- BottomSheet -->
+    <string name="bottom_sheet_behavior">com.google.android.material.bottomsheet.BottomSheetBehavior</string>
+    
+    <!-- 权限说明 -->
+    <string name="permission_explanation_title">需要相册权限</string>
+    <string name="permission_explanation_message">为了帮您自动识别相册中的题目图片，我们需要访问您的相册。\n\n📸 权限选择说明：\n• 允许访问全部：可以自动扫描相册中的最近图片（默认50张），识别题目更方便快捷\n• 允许访问部分：您可以选择特定图片允许访问，应用将按您选择的数量进行扫描\n\n🔒 隐私保护承诺：\n• 所有图片仅在您的设备本地处理\n• 不会上传任何照片到服务器\n• 您可以随时在系统设置中撤销权限</string>
+    <string name="permission_explanation_agree">同意并继续</string>
+    <string name="permission_explanation_later">稍后再说</string>
+    <string name="permission_required_for_feature">此功能需要相册权限才能使用</string>
+</resources>

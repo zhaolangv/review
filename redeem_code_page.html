@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兑换码领取 - 错题复盘 Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .product-info {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .product-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .product-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            font-size: 24px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .code-display {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .copy-btn:hover {
+            background: #5568d3;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .product-name {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">📚</div>
+        <h1>错题复盘 Pro</h1>
+        <p class="subtitle">兑换码领取</p>
+
+        <div class="product-info" id="productInfo">
+            <div class="product-name" id="productName">加载中...</div>
+            <div class="product-desc" id="productDesc">正在加载商品信息...</div>
+            <div class="product-price" id="productPrice">-</div>
+        </div>
+
+        <form id="redeemForm">
+            <div class="form-group">
+                <label for="orderId">订单号 <span style="color: red;">*</span></label>
+                <input type="text" id="orderId" placeholder="请输入您的订单号" required>
+                <small style="color: #999; font-size: 12px; display: block; margin-top: 5px;">
+                    请输入在其他平台购买商品时的订单号，系统会验证订单真实性。
+                </small>
+            </div>
+
+            <div class="form-group" style="display: none;">
+                <label for="deviceId">设备标识（自动生成，用于防刷）</label>
+                <input type="text" id="deviceId" readonly placeholder="正在生成设备标识...">
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">领取兑换码</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在处理中...</p>
+        </div>
+
+        <div class="result" id="result"></div>
+
+        <div class="footer">
+            <p>如有问题，请联系客服</p>
+            <p>© 2026 错题复盘. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        // 配置：商品信息映射
+        const PRODUCTS = {
+            'basic': {
+                name: '基础档 Pro 服务',
+                desc: '60次/月手写擦除，适合轻度使用',
+                price: '¥5/月',
+                productId: 'basic',
+                times: '60次/月'
+            },
+            'standard': {
+                name: '标准档 Pro 服务',
+                desc: '140次/月手写擦除，适合日常使用',
+                price: '¥10/月',
+                productId: 'standard',
+                times: '140次/月'
+            },
+            'advanced': {
+                name: '高级档 Pro 服务',
+                desc: '350次/月手写擦除，适合重度使用',
+                price: '¥25/月',
+                productId: 'advanced',
+                times: '350次/月'
+            }
+        };
+
+        // API配置
+        const API_BASE_URL = 'http://fupan.jnhongniang.xyz';
+
+        // 获取URL参数
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // 生成设备ID
+        // 注意：网页端的设备ID与App中的设备ID不同
+        // - 网页端：用于标识网页用户，防止刷取（格式：web_xxxxx）
+        // - App端：使用Android ID或UUID（格式：Android ID或UUID字符串）
+        // 网页领取的兑换码可以在任何设备上使用，不需要设备ID匹配
+        function generateDeviceId() {
+            let deviceId = localStorage.getItem('deviceId');
+            if (!deviceId) {
+                // 生成一个唯一的设备ID（用于网页端标识）
+                // 格式：web_ + 随机字符串（类似UUID）
+                deviceId = 'web_' + 
+                    Math.random().toString(36).substring(2, 15) + 
+                    Math.random().toString(36).substring(2, 15) + 
+                    Date.now().toString(36);
+                localStorage.setItem('deviceId', deviceId);
+            }
+            return deviceId;
+        }
+
+        // 初始化页面
+        function initPage() {
+            // 获取商品类型（从URL参数获取，如 ?product=basic）
+            const productType = getUrlParameter('product') || 'basic';
+            const product = PRODUCTS[productType] || PRODUCTS['basic'];
+
+            // 显示商品信息
+            document.getElementById('productName').textContent = product.name;
+            document.getElementById('productDesc').textContent = product.desc + ' · ' + product.times;
+            document.getElementById('productPrice').textContent = product.price;
+
+            // 设置设备ID
+            const deviceId = generateDeviceId();
+            document.getElementById('deviceId').value = deviceId;
+
+            // 保存当前商品类型
+            window.currentProduct = product;
+        }
+
+        // 显示结果
+        function showResult(type, message, code = null) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result ' + type;
+            resultDiv.innerHTML = message;
+
+            if (code && type === 'success') {
+                const codeDisplay = document.createElement('div');
+                codeDisplay.className = 'code-display';
+                codeDisplay.textContent = code;
+                resultDiv.appendChild(codeDisplay);
+
+                const copyBtn = document.createElement('button');
+                copyBtn.type = 'button';
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = '复制兑换码';
+                copyBtn.onclick = () => {
+                    navigator.clipboard.writeText(code).then(() => {
+                        copyBtn.textContent = '已复制！';
+                        setTimeout(() => {
+                            copyBtn.textContent = '复制兑换码';
+                        }, 2000);
+                    });
+                };
+                resultDiv.appendChild(copyBtn);
+            }
+        }
+
+        // 隐藏结果
+        function hideResult() {
+            document.getElementById('result').className = 'result';
+        }
+
+        // 领取兑换码
+        async function redeemCode() {
+            const deviceId = document.getElementById('deviceId').value;
+            const product = window.currentProduct;
+
+            if (!deviceId) {
+                showResult('error', '设备ID获取失败，请刷新页面重试');
+                return;
+            }
+
+            // 显示加载状态
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('submitBtn').disabled = true;
+            hideResult();
+
+            try {
+                // 调用后端API领取兑换码
+                const response = await fetch(`${API_BASE_URL}/api/redeem/claim`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        order_id: orderId,
+                        product_id: product.productId,
+                        device_id: deviceId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.data && data.data.code) {
+                    const code = data.data.code;
+                    showResult('success', 
+                        '✅ 兑换码领取成功！<br><br>请在App中输入此兑换码激活Pro服务。',
+                        code
+                    );
+                } else {
+                    const errorMsg = data.message || data.error || '领取失败，请稍后重试';
+                    showResult('error', '❌ ' + errorMsg);
+                }
+            } catch (error) {
+                console.error('领取兑换码失败:', error);
+                showResult('error', '❌ 网络错误，请检查网络连接后重试');
+            } finally {
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+
+        // 表单提交
+        document.getElementById('redeemForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            redeemCode();
+        });
+
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>
+

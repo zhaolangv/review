@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   备份规则文件
+   确保应用数据在更新后不丢失
+-->
+<full-backup-content>
+    <!-- 包含数据库 -->
+    <include domain="database" path="."/>
+    
+    <!-- 包含SharedPreferences -->
+    <include domain="sharedpref" path="."/>
+    
+    <!-- 包含文件（图片等） -->
+    <include domain="file" path="."/>
+    
+    <!-- 排除临时文件 -->
+    <exclude domain="file" path="cache/"/>
+    <exclude domain="file" path="code_cache/"/>
+</full-backup-content>

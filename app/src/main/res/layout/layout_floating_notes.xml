@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- 标题栏（可拖动） -->
+        <LinearLayout
+            android:id="@+id/floatingDragHandle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="8dp">
+
+            <!-- 拖动指示器 -->
+            <View
+                android:layout_width="40dp"
+                android:layout_height="4dp"
+                android:background="@drawable/bg_drag_handle" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="笔记"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_marginStart="12dp" />
+
+            <!-- 最小化按钮 -->
+            <ImageButton
+                android:id="@+id/btnMinimizeNotes"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@android:drawable/arrow_down_float"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="最小化" />
+
+            <!-- 关闭按钮 -->
+            <ImageButton
+                android:id="@+id/btnCloseNotes"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="关闭"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
+
+        <!-- 笔记列表 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/floatingNotesRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:nestedScrollingEnabled="true" />
+
+        <!-- 添加笔记输入区 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <EditText
+                android:id="@+id/floatingAddNoteEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="添加笔记..."
+                android:inputType="textMultiLine"
+                android:minHeight="40dp"
+                android:maxLines="2"
+                android:background="@android:drawable/edit_text"
+                android:padding="8dp"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/floatingAddNoteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="添加"
+                android:minWidth="60dp"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
+

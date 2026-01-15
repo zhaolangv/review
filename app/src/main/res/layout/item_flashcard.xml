@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@color/bg_card">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="120dp">
+
+        <!-- 右上角装饰图片（记忆卡片专用） -->
+        <ImageView
+            android:id="@+id/decorImageView"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:src="@drawable/decor_flashcard_chiikawa"
+            android:scaleType="fitCenter"
+            android:alpha="0.6"
+            android:layout_gravity="top|end"
+            android:layout_margin="4dp"
+            android:contentDescription="装饰图标" />
+
+        <!-- 正面（提示） -->
+        <LinearLayout
+            android:id="@+id/flashcardFront"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:gravity="center"
+            android:minHeight="120dp"
+            android:background="@color/bg_card">
+
+            <TextView
+                android:id="@+id/flashcardFrontText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:text="提示内容" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="点击翻转"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary" />
+
+        </LinearLayout>
+
+        <!-- 背面（内容） -->
+        <LinearLayout
+            android:id="@+id/flashcardBack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:gravity="center"
+            android:minHeight="120dp"
+            android:background="@color/bg_card_alt"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/flashcardBackText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:text="记忆内容" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="点击翻转"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary" />
+
+        </LinearLayout>
+
+        <!-- 时间戳 -->
+        <TextView
+            android:id="@+id/flashcardTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="8dp"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="10sp"
+            android:text="12-01 14:30" />
+
+    </FrameLayout>
+
+</androidx.cardview.widget.CardView>
+

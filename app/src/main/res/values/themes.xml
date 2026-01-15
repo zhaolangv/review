@@ -1,0 +1,46 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- 全屏主题（用于ImageFullscreenActivity，继承自MaterialComponents以支持MaterialButton） -->
+    <style name="Theme.Fullscreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+    
+    <!-- 透明主题（用于对话框Activity，继承自AppCompat以兼容AppCompatActivity） -->
+    <style name="Theme.Transparent" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+    
+    <!-- 全屏透明主题（用于截图框选Activity） -->
+    <style name="Theme.Transparent.Fullscreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+    
+    <!-- Base application theme. -->
+    <style name="Theme.MyApplication" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color (iOS蓝色). -->
+        <item name="colorPrimary">@color/ios_blue</item>
+        <item name="colorPrimaryVariant">@color/ios_blue_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color (iOS浅蓝色). -->
+        <item name="colorSecondary">@color/ios_button_secondary</item>
+        <item name="colorSecondaryVariant">@color/ios_blue</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <!-- Background colors. -->
+        <item name="android:windowBackground">@color/ios_bg_primary</item>
+        <item name="android:colorBackground">@color/ios_bg_primary</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/ios_blue_dark</item>
+        <!-- Customize your theme here. -->
+    </style>
+</resources>

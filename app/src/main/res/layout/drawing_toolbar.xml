@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#E0FFFFFF"
+    android:alpha="0.95"
+    android:elevation="8dp"
+    android:padding="8dp"
+    android:layout_margin="16dp">
+
+    <!-- 画笔按钮 -->
+    <ImageButton
+        android:id="@+id/btnDraw"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="画笔"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- 橡皮擦按钮 -->
+    <ImageButton
+        android:id="@+id/btnEraser"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="橡皮擦"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- 颜色选择 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="颜色"
+            android:textSize="10sp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_gravity="center"
+            android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <View
+                android:id="@+id/colorRed"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="#FF3B30"
+                android:layout_margin="2dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <View
+                android:id="@+id/colorBlue"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="#007AFF"
+                android:layout_margin="2dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <View
+                android:id="@+id/colorGreen"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="#34C759"
+                android:layout_margin="2dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <View
+                android:id="@+id/colorBlack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="#000000"
+                android:layout_margin="2dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 撤销按钮 -->
+    <ImageButton
+        android:id="@+id/btnUndo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@android:drawable/ic_menu_revert"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="撤销"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- 清除当前绘制按钮 -->
+    <ImageButton
+        android:id="@+id/btnClear"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="清除当前"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- 重做题目（清除已保存的标注）按钮 -->
+    <ImageButton
+        android:id="@+id/btnClearAnnotation"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@android:drawable/ic_menu_rotate"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="重做题目"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- 保存按钮 -->
+    <ImageButton
+        android:id="@+id/btnSaveDrawing"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@android:drawable/ic_menu_save"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="保存标注"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- 关闭绘制模式按钮 -->
+    <ImageButton
+        android:id="@+id/btnCloseDrawing"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="关闭标注"
+        android:padding="8dp" />
+
+</LinearLayout>
+

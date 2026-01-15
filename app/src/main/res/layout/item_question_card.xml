@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="0dp"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- 标签区域（放在图片上方） -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="0dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:background="@android:color/white">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tagsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/actionButtonsContainer"
+                android:nestedScrollingEnabled="false" />
+
+            <!-- 操作按钮区域（位于标签区域最右边） -->
+            <LinearLayout
+                android:id="@+id/actionButtonsContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginStart="8dp">
+                
+                <!-- 删除按钮 -->
+                <ImageButton
+                    android:id="@+id/deleteButton"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="删除题目"
+                    android:src="@android:drawable/ic_menu_delete"
+                    android:padding="2dp"
+                    android:scaleType="fitCenter" />
+                
+                <!-- 手写擦除按钮 -->
+                <ImageButton
+                    android:id="@+id/removeHandwritingButton"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="擦除手写"
+                    android:src="@android:drawable/ic_menu_revert"
+                    android:padding="2dp"
+                    android:scaleType="fitCenter" />
+                
+                <!-- 编辑图片按钮 -->
+                <ImageButton
+                    android:id="@+id/editImageButton"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="编辑图片"
+                    android:src="@android:drawable/ic_menu_edit"
+                    android:padding="2dp"
+                    android:scaleType="fitCenter" />
+                
+                <!-- 手写模式按钮 -->
+                <ImageButton
+                    android:id="@+id/btnHandwritingMode"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="手写模式"
+                    android:src="@drawable/ic_hand"
+                    android:padding="2dp"
+                    android:scaleType="fitCenter" />
+                
+                <!-- 清除对错标记按钮 -->
+                <ImageButton
+                    android:id="@+id/removeAnswerMarksButton"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="清除对错标记"
+                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    android:padding="2dp"
+                    android:scaleType="fitCenter" />
+                    
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <!-- 分隔线 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <!-- 图片区域（占屏幕上边，可上下滑动） -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/imageScrollView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fillViewport="true"
+                    android:scrollbars="none">
+
+                    <ImageView
+                        android:id="@+id/questionImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="题目图片" />
+
+                </androidx.core.widget.NestedScrollView>
+
+            </FrameLayout>
+            
+            <!-- 图片切换按钮（仅在已擦写过时显示） -->
+            <ImageButton
+                android:id="@+id/toggleImageButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="切换原图/擦写后"
+                android:src="@android:drawable/ic_menu_view"
+                android:padding="4dp"
+                android:scaleType="fitCenter"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+        <!-- 可拖拽的分隔线 -->
+        <View
+            android:id="@+id/resizeHandle"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:background="@android:color/darker_gray"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- 笔记区域（屏幕下方，固定高度） -->
+        <LinearLayout
+            android:id="@+id/notesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:background="@android:color/white"
+            android:minHeight="280dp">
+
+            <!-- 类型切换按钮（替代笔记标题） -->
+            <LinearLayout
+                android:id="@+id/typeSwitchContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="8dp"
+                android:paddingTop="0dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/noteTypeButton"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="笔记"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:checkable="true"
+                    android:checked="true" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/flashcardTypeButton"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="卡片"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:checkable="true"
+                    android:checked="false" />
+            </LinearLayout>
+
+            <!-- 笔记列表（可滚动） -->
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/notesScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:scrollbars="none"
+                android:fillViewport="false">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/notesRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+            </androidx.core.widget.NestedScrollView>
+
+            <!-- 添加笔记输入区域（笔记模式） -->
+            <LinearLayout
+                android:id="@+id/addNoteContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                android:visibility="visible">
+                
+                <!-- 折叠/展开按钮 -->
+                <TextView
+                    android:id="@+id/toggleNoteInputButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|bottom"
+                    android:text="▼"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="折叠/展开"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp"
+                    android:minHeight="16dp"
+                    android:gravity="center" />
+                
+                <LinearLayout
+                    android:id="@+id/addNoteInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/addNoteEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="添加笔记..."
+                    android:inputType="textMultiLine"
+                    android:minHeight="48dp"
+                    android:maxLines="3"
+                    android:background="@android:drawable/edit_text"
+                    android:padding="8dp" />
+
+                <Button
+                    android:id="@+id/addNoteButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="添加"
+                    android:minWidth="60dp" />
+                    
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 添加卡片输入区域（卡片模式） -->
+            <LinearLayout
+                android:id="@+id/addFlashcardContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+                
+                <!-- 折叠/展开按钮 -->
+                <TextView
+                    android:id="@+id/toggleFlashcardInputButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|bottom"
+                    android:text="▼"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="折叠/展开"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp"
+                    android:minHeight="16dp"
+                    android:gravity="center" />
+                
+                <LinearLayout
+                    android:id="@+id/addFlashcardInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="提示（正面）："
+                    android:textSize="12sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_marginBottom="4dp" />
+
+                <EditText
+                    android:id="@+id/addFlashcardFrontEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="输入提示..."
+                    android:inputType="textMultiLine"
+                    android:minHeight="36dp"
+                    android:maxLines="2"
+                    android:background="@android:drawable/edit_text"
+                    android:padding="6dp"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="内容（背面）："
+                    android:textSize="12sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_marginBottom="2dp" />
+
+                <EditText
+                    android:id="@+id/addFlashcardBackEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="输入内容..."
+                    android:inputType="textMultiLine"
+                    android:minHeight="36dp"
+                    android:maxLines="2"
+                    android:background="@android:drawable/edit_text"
+                    android:padding="6dp"
+                    android:layout_marginBottom="6dp" />
+
+                <Button
+                    android:id="@+id/addFlashcardButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="添加卡片"
+                    android:layout_marginBottom="0dp" />
+                    
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

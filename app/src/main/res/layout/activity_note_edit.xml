@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/bg_primary">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:paddingBottom="64dp">
+
+    <!-- 右上角装饰图片（笔记编辑专用） -->
+    <ImageView
+        android:id="@+id/decorImageView"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/decor_note_chiikawa"
+        android:scaleType="fitCenter"
+        android:alpha="0.6"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="装饰图标" />
+    
+    <!-- 底部装饰图片（填充空白区域） -->
+    <ImageView
+        android:id="@+id/bottomDecorImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/decor_bottom_chiikawa_2"
+        android:scaleType="fitCenter"
+        android:alpha="0.4"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:contentDescription="底部装饰图标" />
+
+    <TextView
+        android:id="@+id/contentLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="笔记内容："
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/decorImageView" />
+
+    <EditText
+        android:id="@+id/contentEditText"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:hint="输入笔记内容..."
+        android:inputType="textMultiLine"
+        android:gravity="top|start"
+        android:minLines="10"
+        android:padding="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/contentLabel"
+        app:layout_constraintBottom_toTopOf="@id/tagsLabel" />
+
+    <TextView
+        android:id="@+id/tagsLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="标签："
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/contentEditText"
+        app:layout_constraintBottom_toTopOf="@id/tagsEditText" />
+
+    <EditText
+        android:id="@+id/tagsEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="点击选择标签"
+        android:inputType="none"
+        android:focusable="false"
+        android:clickable="true"
+        android:padding="8dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tagsLabel"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
+

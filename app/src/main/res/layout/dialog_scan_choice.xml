@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 说明文本 -->
+    <TextView
+        android:id="@+id/descriptionText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="是否现在扫描相册中的题目图片？\n请输入要扫描的图片数量（1-500张）"
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="12dp" />
+
+    <!-- 扫描数量输入框 -->
+    <EditText
+        android:id="@+id/scanCountInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="扫描数量"
+        android:inputType="number"
+        android:maxLines="1"
+        android:background="@android:drawable/edit_text"
+        android:padding="12dp"
+        android:textSize="14sp"
+        android:textColorHint="#999999" />
+
+</LinearLayout>
+

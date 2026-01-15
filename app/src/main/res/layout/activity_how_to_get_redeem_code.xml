@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/bg_primary">
+
+    <!-- 说明文字 -->
+    <TextView
+        android:id="@+id/descriptionText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="兑换码领取方式：\n\n目前暂时还没有兑换码，请稍后再试。"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:padding="24dp"
+        android:background="@android:color/white"
+        android:lineSpacingExtra="8dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 前往领取兑换码按钮 -->
+    <Button
+        android:id="@+id/redeemLinkButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="前往领取兑换码"
+        android:textSize="16sp"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/descriptionText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 前往激活页面按钮 -->
+    <Button
+        android:id="@+id/activateButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="前往激活 Pro 服务"
+        android:textSize="16sp"
+        android:padding="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintTop_toBottomOf="@id/redeemLinkButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 提示文字 -->
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="提示：\n• 兑换码可在其他平台获取\n• 每个兑换码只能使用一次\n• 激活后 Pro 服务将立即生效"
+        android:textSize="12sp"
+        android:textColor="@android:color/darker_gray"
+        android:padding="16dp"
+        android:lineSpacingExtra="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

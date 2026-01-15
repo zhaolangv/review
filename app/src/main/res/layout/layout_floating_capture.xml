@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/bg_floating_button"
+    android:padding="4dp"
+    android:elevation="8dp">
+
+    <!-- 截图按钮 -->
+    <ImageButton
+        android:id="@+id/btnCapture"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@android:drawable/ic_menu_camera"
+        android:background="@drawable/bg_capture_button"
+        android:contentDescription="截图"
+        android:scaleType="centerInside"
+        android:padding="12dp" />
+
+    <!-- 关闭按钮 -->
+    <ImageButton
+        android:id="@+id/btnCloseFloating"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="4dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:background="@android:color/transparent"
+        android:contentDescription="关闭"
+        android:scaleType="centerInside"
+        android:padding="4dp"
+        android:alpha="0.7" />
+
+</LinearLayout>
+
