@@ -32,7 +32,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "snap_review_database"
                 )
-                .addMigrations(MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13)
+                .addMigrations(MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_14_13)
                 .build()
                 INSTANCE = instance
                 instance
@@ -115,6 +115,64 @@ abstract class AppDatabase : RoomDatabase() {
                 // 添加正面和背面图片路径字段
                 database.execSQL("ALTER TABLE standalone_flashcards ADD COLUMN frontImagePath TEXT")
                 database.execSQL("ALTER TABLE standalone_flashcards ADD COLUMN backImagePath TEXT")
+            }
+        }
+        
+        /**
+         * 数据库迁移：从版本14降级到版本13
+         * 删除 hiddenOptionsImagePath 字段（该功能已移除）
+         * SQLite不支持直接删除列，需要重建表
+         */
+        private val MIGRATION_14_13 = object : Migration(14, 13) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // SQLite不支持直接删除列，需要重建表
+                // 1. 创建临时新表（不包含hiddenOptionsImagePath列）
+                database.execSQL("""
+                    CREATE TABLE questions_new (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        imagePath TEXT NOT NULL,
+                        originalImagePath TEXT,
+                        cleanedImagePath TEXT,
+                        annotationPath TEXT,
+                        rawText TEXT NOT NULL,
+                        questionText TEXT NOT NULL,
+                        frontendRawText TEXT,
+                        options TEXT NOT NULL,
+                        createdAt INTEGER NOT NULL,
+                        reviewState TEXT NOT NULL,
+                        userNotes TEXT NOT NULL,
+                        confidence REAL NOT NULL,
+                        questionType TEXT NOT NULL,
+                        backendQuestionId TEXT,
+                        backendQuestionText TEXT,
+                        answerLoaded INTEGER NOT NULL,
+                        correctAnswer TEXT,
+                        explanation TEXT,
+                        tags TEXT NOT NULL
+                    )
+                """.trimIndent())
+                
+                // 2. 复制数据（排除hiddenOptionsImagePath列）
+                database.execSQL("""
+                    INSERT INTO questions_new (
+                        id, imagePath, originalImagePath, cleanedImagePath, annotationPath,
+                        rawText, questionText, frontendRawText, options, createdAt,
+                        reviewState, userNotes, confidence, questionType, backendQuestionId,
+                        backendQuestionText, answerLoaded, correctAnswer, explanation, tags
+                    )
+                    SELECT 
+                        id, imagePath, originalImagePath, cleanedImagePath, annotationPath,
+                        rawText, questionText, frontendRawText, options, createdAt,
+                        reviewState, userNotes, confidence, questionType, backendQuestionId,
+                        backendQuestionText, answerLoaded, correctAnswer, explanation, tags
+                    FROM questions
+                """.trimIndent())
+                
+                // 3. 删除旧表
+                database.execSQL("DROP TABLE questions")
+                
+                // 4. 重命名新表
+                database.execSQL("ALTER TABLE questions_new RENAME TO questions")
             }
         }
     }
