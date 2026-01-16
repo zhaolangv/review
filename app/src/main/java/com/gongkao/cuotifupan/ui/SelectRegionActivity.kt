@@ -14,6 +14,7 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.gongkao.cuotifupan.R
@@ -105,13 +106,23 @@ class SelectRegionActivity : AppCompatActivity() {
      * 启动截图权限请求
      */
     private fun startScreenCapture() {
+        Log.d(TAG, "准备启动截图权限请求")
         // 隐藏当前Activity，然后请求截图
         finish()
         
         // 延迟一下再截图，确保Activity已经完全消失
         android.os.Handler(mainLooper).postDelayed({
-            ScreenCaptureActivity.start(this@SelectRegionActivity)
-        }, 300)
+            try {
+                Log.d(TAG, "启动ScreenCaptureActivity")
+                ScreenCaptureActivity.start(this@SelectRegionActivity)
+            } catch (e: Exception) {
+                Log.e(TAG, "启动ScreenCaptureActivity失败", e)
+                e.printStackTrace()
+                Toast.makeText(this@SelectRegionActivity, "启动截图失败: ${e.message}", Toast.LENGTH_SHORT).show()
+                // 恢复悬浮按钮显示
+                FloatingCaptureService.showFloatingButton()
+            }
+        }, 500) // 增加延迟时间，确保Activity完全关闭
     }
 
     override fun onBackPressed() {

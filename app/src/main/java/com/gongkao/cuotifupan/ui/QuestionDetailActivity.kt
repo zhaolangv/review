@@ -22,6 +22,7 @@ import com.gongkao.cuotifupan.viewmodel.QuestionViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.gongkao.cuotifupan.util.ImageEditor
+import com.gongkao.cuotifupan.util.PreferencesManager
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -36,6 +37,9 @@ class QuestionDetailActivity : AppCompatActivity() {
     
     private lateinit var viewModel: QuestionViewModel
     private var currentQuestion: Question? = null
+    
+    // 当前显示的图片类型：true = 清除对错痕迹后，false = 原图
+    private var showingHiddenOptionsImage: Boolean = false
     
     private lateinit var imageView: ImageView
     private lateinit var questionTextView: TextView
@@ -140,6 +144,16 @@ class QuestionDetailActivity : AppCompatActivity() {
     }
     
     private fun displayQuestion(question: Question) {
+        // 初始化清除对错痕迹的显示状态
+        // 如果有清除后的图片路径，默认显示清除后的图片
+        if (!question.hiddenOptionsImagePath.isNullOrBlank()) {
+            // 有清除后的图片，默认显示清除后的图片
+            showingHiddenOptionsImage = true
+        } else {
+            // 没有清除后的图片，显示原图
+            showingHiddenOptionsImage = false
+        }
+        
         // 显示题目类型
         when (question.questionType) {
             "MULTIPLE_CHOICE" -> {
@@ -202,16 +216,23 @@ class QuestionDetailActivity : AppCompatActivity() {
             }
         }
         
+        // 确定要显示的图片路径（优先级：清除对错痕迹后 > 原图）
+        val imagePathToShow = if (showingHiddenOptionsImage && !question.hiddenOptionsImagePath.isNullOrBlank()) {
+            question.hiddenOptionsImagePath
+        } else {
+            question.originalImagePath ?: question.imagePath
+        }
+        
         // 显示图片（使用 ImageAccessHelper 兼容 Android 10+）
-        val file = File(question.imagePath)
+        val file = File(imagePathToShow)
         // 如果是应用私有文件或公共存储目录的文件，直接使用 Coil 加载
-        if (file.exists() && (question.imagePath.startsWith(filesDir.absolutePath) || 
-            question.imagePath.startsWith(cacheDir.absolutePath) ||
-            question.imagePath.contains("/DCIM/Camera/"))) {
+        if (file.exists() && (imagePathToShow.startsWith(filesDir.absolutePath) || 
+            imagePathToShow.startsWith(cacheDir.absolutePath) ||
+            imagePathToShow.contains("/DCIM/Camera/"))) {
             imageView.load(file)
-        } else if (com.gongkao.cuotifupan.util.ImageAccessHelper.isValidImage(this, question.imagePath)) {
+        } else if (com.gongkao.cuotifupan.util.ImageAccessHelper.isValidImage(this, imagePathToShow)) {
             // 使用 ImageAccessHelper 加载（兼容 MediaStore URI）
-            val bitmap = com.gongkao.cuotifupan.util.ImageAccessHelper.decodeBitmap(this, question.imagePath)
+            val bitmap = com.gongkao.cuotifupan.util.ImageAccessHelper.decodeBitmap(this, imagePathToShow)
             if (bitmap != null) {
                 imageView.setImageBitmap(bitmap)
             } else {
@@ -225,7 +246,7 @@ class QuestionDetailActivity : AppCompatActivity() {
         
         // 点击图片可以全屏查看并缩放
         imageView.setOnClickListener {
-            openImageFullscreen(question.imagePath)
+            openImageFullscreen(imagePathToShow)
         }
         
         // 显示题干（优先显示后端返回的完整题干）
@@ -655,74 +676,109 @@ class QuestionDetailActivity : AppCompatActivity() {
     }
     
     /**
-     * 遮挡选项（原清除对错标记功能已移除，改为遮挡选项）
+     * 清除粉笔错题截图的对错痕迹（支持切换）
      */
     private fun removeAnswerMarks() {
         val question = currentQuestion ?: return
-        val imagePath = question.imagePath
         
-        if (!File(imagePath).exists()) {
+        // 如果已有清除后的图片，实现切换功能
+        if (!question.hiddenOptionsImagePath.isNullOrBlank()) {
+            // 当前显示清除后的图片 -> 还原到原图
+            if (showingHiddenOptionsImage) {
+                restoreOriginalFromHiddenOptions(question)
+            } else {
+                // 当前显示原图 -> 直接切换到已清除的图片
+                showHiddenOptionsImage(question)
+            }
+            return
+        }
+        
+        // 没有清除后的图片，执行清除处理
+        val originalImagePath = question.originalImagePath ?: question.imagePath
+        
+        if (!File(originalImagePath).exists()) {
             Toast.makeText(this, "图片文件不存在", Toast.LENGTH_SHORT).show()
             return
         }
         
-        // 显示确认对话框
-        AlertDialog.Builder(this)
-            .setTitle("遮挡选项")
-            .setMessage("是否遮挡图片上的选项标记（ABCD选项）？\n\n此操作将生成一张新的图片，原图不会被删除。")
-            .setPositiveButton("确定") { _, _ ->
-                lifecycleScope.launch {
-                    // 显示进度提示
-                    val progressDialog = android.app.ProgressDialog(this@QuestionDetailActivity).apply {
-                        setMessage("正在遮挡选项...")
-                        setCancelable(false)
-                        show()
+        // 执行清除操作的函数
+        fun performClear() {
+            lifecycleScope.launch {
+                // 显示进度提示
+                val progressDialog = android.app.ProgressDialog(this@QuestionDetailActivity).apply {
+                    setMessage("正在清除对错痕迹...")
+                    setCancelable(false)
+                    show()
+                }
+                
+                try {
+                    // 初始化ImageEditor
+                    ImageEditor.init(this@QuestionDetailActivity)
+                    
+                    // 在后台线程执行清除操作
+                    val hiddenImagePath = withContext(Dispatchers.IO) {
+                        ImageEditor.hideOptions(originalImagePath)
                     }
                     
-                    try {
-                        // 初始化ImageEditor
-                        ImageEditor.init(this@QuestionDetailActivity)
+                    progressDialog.dismiss()
+                    
+                    if (hiddenImagePath != null) {
+                        // 保存清除后的图片路径
+                        val updatedQuestion = question.copy(
+                            hiddenOptionsImagePath = hiddenImagePath,
+                            originalImagePath = originalImagePath  // 确保originalImagePath存在
+                        )
+                        viewModel.update(updatedQuestion)
+                        currentQuestion = updatedQuestion
                         
-                        // 在后台线程执行遮挡操作
-                        val maskedImagePath = withContext(Dispatchers.IO) {
-                            ImageEditor.hideOptions(imagePath)
-                        }
+                        // 切换到清除后的图片
+                        showingHiddenOptionsImage = true
+                        displayQuestion(updatedQuestion)
                         
-                        progressDialog.dismiss()
-                        
-                        if (maskedImagePath != null) {
-                            // 询问是否替换原图
-                            AlertDialog.Builder(this@QuestionDetailActivity)
-                                .setTitle("遮挡完成")
-                                .setMessage("选项已遮挡。是否用遮挡后的图片替换原图？")
-                                .setPositiveButton("替换") { _, _ ->
-                                    lifecycleScope.launch {
-                                        // 更新数据库中的图片路径
-                                        val updatedQuestion = question.copy(imagePath = maskedImagePath)
-                                        viewModel.update(updatedQuestion)
-                                        currentQuestion = updatedQuestion
-                                        
-                                        // 重新加载图片
-                                        displayQuestion(updatedQuestion)
-                                        
-                                        Toast.makeText(this@QuestionDetailActivity, "已替换原图", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                                .setNegativeButton("保留原图") { _, _ ->
-                                    Toast.makeText(this@QuestionDetailActivity, "遮挡完成，原图已保留", Toast.LENGTH_SHORT).show()
-                                }
-                                .show()
-                        } else {
-                            Toast.makeText(this@QuestionDetailActivity, "遮挡选项失败", Toast.LENGTH_SHORT).show()
-                        }
-                    } catch (e: Exception) {
-                        progressDialog.dismiss()
-                        Toast.makeText(this@QuestionDetailActivity, "遮挡选项失败: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@QuestionDetailActivity, "已清除对错痕迹", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@QuestionDetailActivity, "清除失败", Toast.LENGTH_SHORT).show()
                     }
+                } catch (e: Exception) {
+                    progressDialog.dismiss()
+                    Toast.makeText(this@QuestionDetailActivity, "清除失败: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("取消", null)
-            .show()
+        }
+        
+        // 检查是否需要显示提示（前5次显示）
+        if (com.gongkao.cuotifupan.util.PreferencesManager.shouldShowClearMarksHint(this)) {
+            // 显示确认对话框
+            AlertDialog.Builder(this)
+                .setTitle("清除对错痕迹")
+                .setMessage("此功能用于清除粉笔错题截图中的对错痕迹，包括：\n\n• 选项圆圈的对错标记（绿色/红色）\n• 底部的答案提示文字（如\"正确答案\"、\"你的答案\"等）\n• 其他红色和绿色标记\n\n同时会智能裁剪掉答案说明行及以下内容。\n\n此操作将生成一张新的图片，原图不会被删除。如果不满意，可以手动调整。")
+                .setPositiveButton("确定") { _, _ ->
+                    // 增加提示显示次数
+                    com.gongkao.cuotifupan.util.PreferencesManager.incrementClearMarksHintCount(this)
+                    performClear()
+                }
+                .setNegativeButton("取消", null)
+                .show()
+        } else {
+            // 已经显示过5次，直接执行清除
+            performClear()
+        }
+    }
+    
+    /**
+     * 显示已清除的图片
+     */
+    private fun showHiddenOptionsImage(question: Question) {
+        showingHiddenOptionsImage = true
+        displayQuestion(question)
+    }
+    
+    /**
+     * 还原到原图（从清除后的图片还原）
+     */
+    private fun restoreOriginalFromHiddenOptions(question: Question) {
+        showingHiddenOptionsImage = false
+        displayQuestion(question)
     }
     
     companion object {

@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -48,19 +50,61 @@ class ScreenCaptureActivity : AppCompatActivity() {
         finish()
     }
 
+    private var hasRequestedPermission = false
+    private val handler = Handler(Looper.getMainLooper())
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate: Activity已创建, savedInstanceState=$savedInstanceState")
         
-        // 请求屏幕录制权限
-        requestScreenCapturePermission()
+        // 不设置布局，因为这是透明Activity
+        // setContentView 不需要，因为Activity是透明的
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume: Activity已恢复, hasRequestedPermission=$hasRequestedPermission")
+        
+        // 在 onResume 中请求权限，确保 Activity 完全可见
+        if (!hasRequestedPermission) {
+            hasRequestedPermission = true
+            // 使用 Handler 延迟请求，确保 Activity 完全显示
+            handler.postDelayed({
+                Log.d(TAG, "handler.postDelayed: 准备请求权限")
+                if (!isFinishing && !isDestroyed) {
+                    requestScreenCapturePermission()
+                } else {
+                    Log.w(TAG, "Activity已销毁，取消权限请求")
+                }
+            }, 300)
+        }
+    }
+    
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart: Activity已启动")
+    }
+    
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause: Activity已暂停")
+    }
+    
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop: Activity已停止")
     }
 
     private fun requestScreenCapturePermission() {
         try {
+            Log.d(TAG, "开始请求屏幕录制权限")
             val captureIntent = mediaProjectionManager.createScreenCaptureIntent()
+            Log.d(TAG, "创建权限请求Intent成功，准备启动")
             screenCaptureLauncher.launch(captureIntent)
+            Log.d(TAG, "权限请求对话框已启动")
         } catch (e: Exception) {
             Log.e(TAG, "请求屏幕录制权限失败", e)
+            e.printStackTrace()
             Toast.makeText(this, "请求权限失败: ${e.message}", Toast.LENGTH_SHORT).show()
             // 恢复悬浮按钮显示
             FloatingCaptureService.showFloatingButton()
@@ -70,6 +114,9 @@ class ScreenCaptureActivity : AppCompatActivity() {
     
     override fun onDestroy() {
         super.onDestroy()
+        Log.d(TAG, "onDestroy: Activity已销毁")
+        // 取消所有待处理的请求
+        handler.removeCallbacksAndMessages(null)
         // 确保悬浮按钮恢复显示
         FloatingCaptureService.showFloatingButton()
     }

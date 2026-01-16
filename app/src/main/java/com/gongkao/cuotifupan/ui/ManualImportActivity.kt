@@ -22,6 +22,7 @@ import com.gongkao.cuotifupan.data.AppDatabase
 import com.gongkao.cuotifupan.data.Question
 import com.gongkao.cuotifupan.detector.QuestionDetector
 import com.gongkao.cuotifupan.ocr.TextRecognizer
+import com.gongkao.cuotifupan.util.PreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -487,9 +488,9 @@ class ManualImportActivity : AppCompatActivity() {
             progressBar.visibility = View.GONE
             
             val message = when {
-                questionCount > 0 -> "成功导入 $questionCount 道题目（共处理 $successCount 张图片）"
-                errorCount > 0 -> "处理了 $successCount 张图片，$errorCount 张失败"
-                else -> "成功处理 $successCount 张图片"
+                questionCount > 0 -> "✅ 成功导入 $questionCount 道题目（共处理 $successCount 张图片）"
+                errorCount > 0 -> "⚠️ 处理了 $successCount 张图片，$errorCount 张失败"
+                else -> "✅ 成功处理 $successCount 张图片"
             }
             
             Toast.makeText(this@ManualImportActivity, message, Toast.LENGTH_LONG).show()

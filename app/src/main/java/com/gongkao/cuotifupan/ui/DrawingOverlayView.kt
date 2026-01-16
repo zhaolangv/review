@@ -93,6 +93,8 @@ class DrawingOverlayView @JvmOverloads constructor(
 
     init {
         setLayerType(LAYER_TYPE_SOFTWARE, null) // 使用软件渲染以支持橡皮擦
+        // 设置白色背景，用于手写模式
+        setBackgroundColor(android.graphics.Color.WHITE)
     }
     
     /**
@@ -247,13 +249,27 @@ class DrawingOverlayView @JvmOverloads constructor(
                 
                 currentPath?.let { path ->
                     currentPaint?.let { paint ->
-                        // 保存到所有路径列表
-                        val savedPath = Path(path)
-                        val savedPaint = Paint(paint)
-                        allPaths.add(DrawPath(savedPath, savedPaint))
-                        
-                        // 绘制到bitmap上
-                        drawingCanvas?.drawPath(path, paint)
+                        if (isDrawingMode) {
+                            // 画笔模式：保存路径并绘制
+                            val savedPath = Path(path)
+                            val savedPaint = Paint(paint)
+                            allPaths.add(DrawPath(savedPath, savedPaint))
+                            
+                            // 绘制到bitmap上
+                            drawingCanvas?.drawPath(path, paint)
+                        } else {
+                            // 橡皮擦模式：直接清除bitmap上的像素，不保存路径
+                            // 清除后需要重新绘制所有路径，确保被擦除的部分不会重新出现
+                            drawingCanvas?.drawPath(path, paint)
+                            
+                            // 重新绘制所有路径，这样被擦除的部分就不会再出现了
+                            drawingBitmap?.eraseColor(0)
+                            drawingCanvas?.let { canvas ->
+                                allPaths.forEach { drawPath ->
+                                    canvas.drawPath(drawPath.path, drawPath.paint)
+                                }
+                            }
+                        }
                     }
                 }
                 

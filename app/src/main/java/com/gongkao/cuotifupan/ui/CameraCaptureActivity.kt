@@ -35,6 +35,7 @@ import com.gongkao.cuotifupan.ocr.TextRecognizer
 import com.gongkao.cuotifupan.api.QuestionApiQueue
 import com.gongkao.cuotifupan.api.HandwritingRemovalService
 import com.gongkao.cuotifupan.util.ImageEditor
+import com.gongkao.cuotifupan.util.PreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,6 +62,7 @@ class CameraCaptureActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     
     private var autoDetectDialog: AlertDialog? = null
+    private var importSuccessDialog: AlertDialog? = null
     private var autoDetectProgressText: TextView? = null
     
     private var photoUri: Uri? = null
@@ -245,6 +247,8 @@ class CameraCaptureActivity : AppCompatActivity() {
                         currentBitmap = bitmap
                         cropImageView.setBitmap(bitmap)
                         showCropMode()
+                        // 隐藏进度条，因为图片已加载完成
+                        progressBar.visibility = View.GONE
                         Log.i("CameraCapture", "✅ 已切换到裁剪模式，准备自动检测题目")
                         // 自动执行题目区域检测
                         autoDetectQuestions()
@@ -670,38 +674,59 @@ class CameraCaptureActivity : AppCompatActivity() {
                     Log.i("CameraCapture", "当前Activity状态: isFinishing=${isFinishing}, isDestroyed=${isDestroyed}")
                     
                     val message = when {
-                        successCount > 0 && failCount == 0 -> "成功导入 $successCount 道题目"
-                        successCount > 0 && failCount > 0 -> "成功导入 $successCount 道题目，$failCount 道失败"
-                        else -> "导入失败，请重试"
+                        successCount > 0 && failCount == 0 -> "✅ 成功导入 $successCount 道题目！"
+                        successCount > 0 && failCount > 0 -> "✅ 成功导入 $successCount 道题目，$failCount 道失败"
+                        else -> "❌ 导入失败，请重试"
                     }
-                    Toast.makeText(this@CameraCaptureActivity, message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@CameraCaptureActivity, message, Toast.LENGTH_LONG).show()
                     
                     if (successCount > 0) {
+                        // 检查 Activity 是否还在运行
+                        if (isFinishing || isDestroyed) {
+                            Log.w("CameraCapture", "⚠️ Activity 已销毁，不显示对话框")
+                            return@withContext
+                        }
+                        
                         Log.i("CameraCapture", "✅ 显示导入成功对话框，提供用户选择")
+                        // 先关闭之前的对话框（如果存在）
+                        importSuccessDialog?.dismiss()
+                        
                         // 显示成功对话框，提供多个选项
-                        android.app.AlertDialog.Builder(this@CameraCaptureActivity)
+                        importSuccessDialog = android.app.AlertDialog.Builder(this@CameraCaptureActivity)
                             .setTitle("导入成功")
                             .setMessage("成功导入 $successCount 道题目。\n\n请选择下一步操作：")
                             .setPositiveButton("继续调整") { _, _ ->
                                 Log.i("CameraCapture", "✅ 用户选择：继续调整，停留在裁剪页面")
+                                importSuccessDialog = null
                                 // 继续停留在当前裁剪页面，用户可以继续调整裁剪框或添加新的裁剪框
                                 // 已导入的裁剪框可以保留，也可以删除后重新添加
                             }
                             .setNeutralButton("重新拍照") { _, _ ->
                                 Log.i("CameraCapture", "✅ 用户选择：重新拍照")
+                                importSuccessDialog = null
                                 // 清空当前图片，重新进入拍照模式
                                 resetToCaptureMode()
                             }
                             .setNegativeButton("完成返回") { _, _ ->
                                 Log.i("CameraCapture", "✅ 用户选择：完成返回，关闭页面")
+                                importSuccessDialog = null
                                 finish()
                             }
                             .setCancelable(false) // 不允许点击外部关闭，必须选择操作
                             .setOnDismissListener {
                                 Log.i("CameraCapture", "对话框已关闭，但页面保持打开")
+                                importSuccessDialog = null
                             }
-                            .show()
-                        Log.i("CameraCapture", "✅ 对话框已显示，等待用户选择，不会自动关闭页面")
+                            .create()
+                        
+                        // 再次检查 Activity 状态
+                        if (!isFinishing && !isDestroyed) {
+                            importSuccessDialog?.show()
+                            Log.i("CameraCapture", "✅ 对话框已显示，等待用户选择，不会自动关闭页面")
+                        } else {
+                            Log.w("CameraCapture", "⚠️ Activity 在显示对话框前已销毁")
+                            importSuccessDialog = null
+                        }
                     } else {
                         Log.i("CameraCapture", "⚠️ 导入失败，停留在裁剪页面，等待用户重试")
                     }
@@ -1092,7 +1117,12 @@ class CameraCaptureActivity : AppCompatActivity() {
     override fun onDestroy() {
         Log.i("CameraCapture", "========== onDestroy 被调用 ==========")
         Log.i("CameraCapture", "isFinishing: $isFinishing")
+        
+        // 关闭所有对话框，防止窗口泄漏
         hideAutoDetectDialog()
+        importSuccessDialog?.dismiss()
+        importSuccessDialog = null
+        
         Log.i("CameraCapture", "调用栈:")
         Thread.currentThread().stackTrace.take(10).forEach {
             Log.i("CameraCapture", "  at ${it.className}.${it.methodName}(${it.fileName}:${it.lineNumber})")

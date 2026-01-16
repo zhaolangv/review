@@ -136,6 +136,9 @@ class QuestionCardAdapter(
         // 当前显示的图片类型：true = 擦写后，false = 原图
         private var showingCleanedImage: Boolean = true
         
+        // 当前显示的图片类型：true = 清除对错痕迹后，false = 原图
+        private var showingHiddenOptionsImage: Boolean = false
+        
         /**
          * 设置图片为原图大小（宽度匹配视图，高度按比例）
          * 注意：现在使用 fitCenter，不再强制设置高度
@@ -268,10 +271,22 @@ class QuestionCardAdapter(
                 }
             }
             
-            // 设置遮挡选项按钮（原"清除对错标记"按钮改为"遮挡选项"）
+            // 设置清除对错痕迹按钮（支持切换）
             removeAnswerMarksButton.setOnClickListener {
                 val question = currentQuestion ?: return@setOnClickListener
-                hideOptions(question)
+                // 如果已有清除后的图片
+                if (!question.hiddenOptionsImagePath.isNullOrBlank()) {
+                    // 当前显示清除后的图片 -> 还原到原图
+                    if (showingHiddenOptionsImage) {
+                        restoreOriginalFromHiddenOptions(question)
+                    } else {
+                        // 当前显示原图 -> 直接切换到已清除的图片（不重新处理）
+                        showHiddenOptionsImage(question)
+                    }
+                } else {
+                    // 没有清除后的图片，执行清除处理
+                    hideOptions(question)
+                }
             }
         }
         
@@ -658,6 +673,16 @@ class QuestionCardAdapter(
                 showingCleanedImage = false
             }
             
+            // 初始化清除对错痕迹的显示状态
+            // 如果有清除后的图片路径，默认显示清除后的图片（类似擦写后的图片）
+            if (!question.hiddenOptionsImagePath.isNullOrBlank()) {
+                // 有清除后的图片，默认显示清除后的图片
+                showingHiddenOptionsImage = true
+            } else {
+                // 没有清除后的图片，显示原图
+                showingHiddenOptionsImage = false
+            }
+            
             // 隐藏原来的切换按钮（不再需要）
             toggleImageButton.visibility = View.GONE
             
@@ -711,15 +736,27 @@ class QuestionCardAdapter(
                 (itemView.parent as? ViewGroup)?.requestLayout()
             }
             
-            // 确定要显示的图片路径（如果有擦写后的图片，默认显示擦写后的）
-            val imagePathToShow = if (!question.cleanedImagePath.isNullOrBlank() && showingCleanedImage) {
-                question.cleanedImagePath
-                } else {
-                question.originalImagePath ?: question.imagePath
+            // 确定要显示的图片路径（优先级：清除对错痕迹后 > 擦写后 > 原图）
+            val imagePathToShow = when {
+                // 如果显示清除对错痕迹后的图片
+                showingHiddenOptionsImage && !question.hiddenOptionsImagePath.isNullOrBlank() -> {
+                    question.hiddenOptionsImagePath
+                }
+                // 如果显示擦写后的图片
+                showingCleanedImage && !question.cleanedImagePath.isNullOrBlank() -> {
+                    question.cleanedImagePath
+                }
+                // 否则显示原图
+                else -> {
+                    question.originalImagePath ?: question.imagePath
+                }
             }
             
             // 加载图片（全图显示，保持原始宽高比）
             loadImage(imagePathToShow)
+            
+            // 更新清除对错痕迹按钮状态
+            updateHideOptionsButton(question)
             
             // 设置图片点击事件，打开全屏查看页面
             imageView.setOnClickListener {
@@ -1293,99 +1330,125 @@ class QuestionCardAdapter(
         }
         
         /**
-         * 遮挡选项A、B、C、D（用黑色块遮挡，并裁剪答案说明行）
+         * 清除粉笔错题截图的对错痕迹
          */
         private fun hideOptions(question: Question) {
-            val imagePath = question.imagePath
+            // 确定使用的原图路径（优先使用originalImagePath，如果不存在则使用imagePath）
+            val originalImagePath = question.originalImagePath ?: question.imagePath
             
-            if (!File(imagePath).exists()) {
+            if (!File(originalImagePath).exists()) {
                 Toast.makeText(itemView.context, "图片文件不存在", Toast.LENGTH_SHORT).show()
                 return
             }
             
-            // 显示确认对话框
-            androidx.appcompat.app.AlertDialog.Builder(itemView.context)
-                .setTitle("遮挡选项")
-                .setMessage("是否遮挡选项A、B、C、D（用黑色块遮挡）？\n\n同时会裁剪掉答案说明行（如'正确答案'、'错误答案'等）及以下内容。\n\n此操作将生成一张新的图片，原图不会被删除。")
-                .setPositiveButton("确定") { _, _ ->
-                    // 获取LifecycleOwner（从View的context获取Activity）
-                    val context = itemView.context
-                    if (context is androidx.lifecycle.LifecycleOwner) {
-                        context.lifecycleScope.launch {
-                            // 显示进度提示
-                            val progressDialog = android.app.ProgressDialog(context).apply {
-                                setMessage("正在遮挡选项...")
-                                setCancelable(false)
-                                show()
+            val context = itemView.context
+            
+            // 执行清除操作的函数
+            fun performClear() {
+                if (context is androidx.lifecycle.LifecycleOwner) {
+                    context.lifecycleScope.launch {
+                        // 显示进度提示
+                        val progressDialog = android.app.ProgressDialog(context).apply {
+                            setMessage("正在清除对错痕迹...")
+                            setCancelable(false)
+                            show()
+                        }
+                        
+                        try {
+                            // 初始化ImageEditor
+                            ImageEditor.init(context)
+                            
+                            // 在后台线程执行清除操作
+                            val hiddenImagePath = withContext(Dispatchers.IO) {
+                                ImageEditor.hideOptions(originalImagePath)
                             }
                             
-                            try {
-                                // 初始化ImageEditor
-                                ImageEditor.init(context)
+                            progressDialog.dismiss()
+                            
+                            if (hiddenImagePath != null) {
+                                // 保存清除后的图片路径
+                                val updatedQuestion = question.copy(
+                                    hiddenOptionsImagePath = hiddenImagePath,
+                                    originalImagePath = originalImagePath  // 确保originalImagePath存在
+                                )
+                                onQuestionUpdate(updatedQuestion)
                                 
-                                // 在后台线程执行遮挡操作
-                                val maskedImagePath = withContext(Dispatchers.IO) {
-                                    ImageEditor.hideOptions(imagePath)
-                                }
+                                // 切换到清除后的图片
+                                showingHiddenOptionsImage = true
+                                loadImage(hiddenImagePath)
+                                updateHideOptionsButton(updatedQuestion)
                                 
-                                progressDialog.dismiss()
-                                
-                                if (maskedImagePath != null) {
-                                    // 询问是否替换原图
-                                    androidx.appcompat.app.AlertDialog.Builder(context)
-                                        .setTitle("遮挡完成")
-                                        .setMessage("选项已遮挡。是否用遮挡后的图片替换原图？")
-                                        .setPositiveButton("替换") { _, _ ->
-                                            // 更新题目
-                                            val updatedQuestion = question.copy(imagePath = maskedImagePath)
-                                            onQuestionUpdate(updatedQuestion)
-                                            
-                                            // 重新加载图片
-                                            loadImage(maskedImagePath)
-                                            
-                                            Toast.makeText(context, "已替换原图", Toast.LENGTH_SHORT).show()
-                                        }
-                                        .setNegativeButton("保留原图") { _, _ ->
-                                            Toast.makeText(context, "遮挡完成，原图已保留", Toast.LENGTH_SHORT).show()
-                                        }
-                                        .show()
-                                } else {
-                                    Toast.makeText(context, "遮挡选项失败", Toast.LENGTH_SHORT).show()
-                                }
-                            } catch (e: Exception) {
-                                progressDialog.dismiss()
-                                Toast.makeText(context, "遮挡选项失败: ${e.message}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "已清除对错痕迹", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(context, "清除失败", Toast.LENGTH_SHORT).show()
                             }
-                        }
-                    } else {
-                        // 如果无法获取LifecycleOwner，使用GlobalScope（不推荐，但作为备用）
-                        GlobalScope.launch {
-                            try {
-                                ImageEditor.init(context)
-                                val maskedImagePath = withContext(Dispatchers.IO) {
-                                    ImageEditor.hideOptions(imagePath)
-                                }
-                                
-                                withContext(Dispatchers.Main) {
-                                    if (maskedImagePath != null) {
-                                        val updatedQuestion = question.copy(imagePath = maskedImagePath)
-                                        onQuestionUpdate(updatedQuestion)
-                                        loadImage(maskedImagePath)
-                                        Toast.makeText(context, "遮挡完成，已替换原图", Toast.LENGTH_SHORT).show()
-                                    } else {
-                                        Toast.makeText(context, "遮挡选项失败", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            } catch (e: Exception) {
-                                withContext(Dispatchers.Main) {
-                                    Toast.makeText(context, "遮挡选项失败: ${e.message}", Toast.LENGTH_SHORT).show()
-                                }
-                            }
+                        } catch (e: Exception) {
+                            progressDialog.dismiss()
+                            Toast.makeText(context, "清除失败: ${e.message}", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
-                .setNegativeButton("取消", null)
-                .show()
+            }
+            
+            // 检查是否需要显示提示（前5次显示）
+            if (PreferencesManager.shouldShowClearMarksHint(context)) {
+                // 显示确认对话框
+                androidx.appcompat.app.AlertDialog.Builder(context)
+                    .setTitle("清除对错痕迹")
+                    .setMessage("此功能用于清除粉笔错题截图中的对错痕迹，包括：\n\n• 选项圆圈的对错标记（绿色/红色）\n• 底部的答案提示文字（如\"正确答案\"、\"你的答案\"等）\n• 其他红色和绿色标记\n\n同时会智能裁剪掉答案说明行及以下内容。\n\n此操作将生成一张新的图片，原图不会被删除。如果不满意，可以手动调整。")
+                    .setPositiveButton("确定") { _, _ ->
+                        // 增加提示显示次数
+                        PreferencesManager.incrementClearMarksHintCount(context)
+                        performClear()
+                    }
+                    .setNegativeButton("取消", null)
+                    .show()
+            } else {
+                // 已经显示过5次，直接执行清除
+                performClear()
+            }
+        }
+        
+        /**
+         * 显示已清除的图片（不重新处理，直接使用已有的清除结果）
+         */
+        private fun showHiddenOptionsImage(question: Question) {
+            val hiddenImagePath = question.hiddenOptionsImagePath ?: return
+            
+            val file = File(hiddenImagePath)
+            if (!file.exists()) {
+                Log.w("QuestionCardAdapter", "清除后的图片文件不存在，重新执行清除: $hiddenImagePath")
+                hideOptions(question)
+                return
+            }
+            
+            showingHiddenOptionsImage = true
+            loadImage(hiddenImagePath)
+            updateHideOptionsButton(question)
+            
+            Log.d("QuestionCardAdapter", "直接显示已清除的图片: $hiddenImagePath")
+        }
+        
+        /**
+         * 还原到原图（从清除后的图片还原）
+         */
+        private fun restoreOriginalFromHiddenOptions(question: Question) {
+            showingHiddenOptionsImage = false
+            
+            // 确定要显示的原图路径
+            val originalImagePath = question.originalImagePath ?: question.imagePath
+            
+            // 加载图片
+            loadImage(originalImagePath)
+            updateHideOptionsButton(question)
+        }
+        
+        /**
+         * 更新清除对错痕迹按钮状态
+         */
+        private fun updateHideOptionsButton(question: Question) {
+            // 根据当前状态更新按钮提示（可以在这里添加图标或文字变化）
+            // 目前只是确保状态正确，UI上可能不需要明显变化
         }
     }
     

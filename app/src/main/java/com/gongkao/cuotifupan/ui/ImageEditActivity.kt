@@ -38,6 +38,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import com.gongkao.cuotifupan.util.PreferencesManager
 
 /**
  * 图片编辑 Activity
@@ -62,14 +63,14 @@ class ImageEditActivity : AppCompatActivity() {
     private lateinit var btnDraw: ImageButton
     private lateinit var btnEraser: ImageButton
     private lateinit var btnUndo: ImageButton
-    private lateinit var btnClear: ImageButton
     private lateinit var btnSaveDrawing: ImageButton
-    private lateinit var btnCloseDrawing: ImageButton
-    private lateinit var btnClearAnnotation: ImageButton
+    private lateinit var currentColorButton: View
+    private lateinit var colorPickerContainer: View
     private lateinit var colorRed: View
     private lateinit var colorBlue: View
     private lateinit var colorGreen: View
     private lateinit var colorBlack: View
+    private var currentSelectedColor: View? = null
     
     private var imagePath: String? = null
     private var originalImagePath: String? = null  // 保存原始图片路径
@@ -182,10 +183,9 @@ class ImageEditActivity : AppCompatActivity() {
         btnDraw = findViewById(R.id.btnDraw)
         btnEraser = findViewById(R.id.btnEraser)
         btnUndo = findViewById(R.id.btnUndo)
-        btnClear = findViewById(R.id.btnClear)
         btnSaveDrawing = findViewById(R.id.btnSaveDrawing)
-        btnCloseDrawing = findViewById(R.id.btnCloseDrawing)
-        btnClearAnnotation = findViewById(R.id.btnClearAnnotation)
+        currentColorButton = findViewById(R.id.currentColorButton)
+        colorPickerContainer = findViewById(R.id.colorPickerContainer)
         colorRed = findViewById(R.id.colorRed)
         colorBlue = findViewById(R.id.colorBlue)
         colorGreen = findViewById(R.id.colorGreen)
@@ -269,50 +269,41 @@ class ImageEditActivity : AppCompatActivity() {
             drawingOverlayView.undo()
         }
         
-        // 清除按钮
-        btnClear.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle("清除所有标注")
-                .setMessage("确定要清除所有绘制内容吗？")
-                .setPositiveButton("确定") { _, _ ->
-                    drawingOverlayView.clearAll()
-                }
-                .setNegativeButton("取消", null)
-                .show()
-        }
-        
         // 保存按钮
         btnSaveDrawing.setOnClickListener {
             saveAnnotation()
         }
         
-        // 关闭标注模式按钮
-        btnCloseDrawing.setOnClickListener {
-            enableDrawingMode(false)
-            Toast.makeText(this, "标注模式已关闭", Toast.LENGTH_SHORT).show()
-        }
-        
-        // 清除已保存的标注按钮
-        btnClearAnnotation.setOnClickListener {
-            clearAnnotation()
+        // 当前颜色按钮（点击展开/收起颜色选择）
+        currentColorButton.setOnClickListener {
+            val isVisible = colorPickerContainer.visibility == View.VISIBLE
+            colorPickerContainer.visibility = if (isVisible) View.GONE else View.VISIBLE
         }
         
         // 颜色选择
         colorRed.setOnClickListener {
             drawingOverlayView.setBrushColor(android.graphics.Color.parseColor("#FF3B30"))
             updateColorSelection(colorRed)
+            // 选择后收起颜色选择
+            colorPickerContainer.visibility = View.GONE
         }
         colorBlue.setOnClickListener {
             drawingOverlayView.setBrushColor(android.graphics.Color.parseColor("#007AFF"))
             updateColorSelection(colorBlue)
+            // 选择后收起颜色选择
+            colorPickerContainer.visibility = View.GONE
         }
         colorGreen.setOnClickListener {
             drawingOverlayView.setBrushColor(android.graphics.Color.parseColor("#34C759"))
             updateColorSelection(colorGreen)
+            // 选择后收起颜色选择
+            colorPickerContainer.visibility = View.GONE
         }
         colorBlack.setOnClickListener {
             drawingOverlayView.setBrushColor(android.graphics.Color.parseColor("#000000"))
             updateColorSelection(colorBlack)
+            // 选择后收起颜色选择
+            colorPickerContainer.visibility = View.GONE
         }
         
         // 默认选中红色
@@ -332,6 +323,20 @@ class ImageEditActivity : AppCompatActivity() {
      * 更新颜色选择状态
      */
     private fun updateColorSelection(selectedView: View) {
+        // 更新当前选中的颜色
+        currentSelectedColor = selectedView
+        
+        // 更新当前颜色按钮的背景色
+        val colorMap = mapOf(
+            colorRed to "#FF3B30",
+            colorBlue to "#007AFF",
+            colorGreen to "#34C759",
+            colorBlack to "#000000"
+        )
+        colorMap[selectedView]?.let { colorHex ->
+            currentColorButton.setBackgroundColor(android.graphics.Color.parseColor(colorHex))
+        }
+        
         // 重置所有颜色的缩放
         colorRed.scaleX = 1.0f
         colorRed.scaleY = 1.0f
@@ -366,14 +371,22 @@ class ImageEditActivity : AppCompatActivity() {
         cropButton.isEnabled = !enabled
         
         if (enabled) {
+            // 手写模式下隐藏图片，只显示白色背景画布
+            cropImageView.visibility = View.GONE
             // 加载已有标注到绘制层（可继续编辑）
             currentQuestion?.let {
                 loadAnnotation(it.annotationPath)
             }
-            Toast.makeText(this, "标注模式：在图片上直接书写标注", Toast.LENGTH_SHORT).show()
+            // 确保颜色选择容器默认隐藏
+            colorPickerContainer.visibility = View.GONE
+            Toast.makeText(this, "标注模式：在白色画布上直接书写标注", Toast.LENGTH_SHORT).show()
         } else {
-            // 退出标注模式时，清除绘制层（不保存）
+            // 退出标注模式时，恢复显示图片
+            cropImageView.visibility = View.VISIBLE
+            // 清除绘制层（不保存）
             drawingOverlayView.clearAll()
+            // 隐藏颜色选择容器
+            colorPickerContainer.visibility = View.GONE
         }
     }
     
@@ -868,50 +881,8 @@ class ImageEditActivity : AppCompatActivity() {
                 return@launch
         }
         
-        // 询问是否清除手写笔记
-            AlertDialog.Builder(this@ImageEditActivity)
-            .setTitle("清除手写笔记")
-            .setMessage("是否自动清除图片中的手写笔记，只保留打印文字？\n\n此功能可以净化错题图片，方便重新练习。")
-            .setPositiveButton("是，清除手写") { _, _ ->
-                // 清除手写笔记
-                lifecycleScope.launch {
-                    progressBar.visibility = View.VISIBLE
-                    saveButton.isEnabled = false
-                    
-                    // 初始化ImageEditor
-                    ImageEditor.init(this@ImageEditActivity)
-                    
-                    val cleanedPath = withContext(Dispatchers.IO) {
-                        ImageEditor.removeHandwrittenNotes(editedPath, 0.6f)
-                    }
-                    
-                    progressBar.visibility = View.GONE
-                    saveButton.isEnabled = true
-                    
-                    val finalPath = cleanedPath ?: editedPath
-                    if (cleanedPath == null) {
-                        Toast.makeText(this@ImageEditActivity, "清除手写笔记失败，使用原图", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this@ImageEditActivity, "手写笔记已清除", Toast.LENGTH_SHORT).show()
-                    }
-                    
-                    // 询问是否替换原图
-                    askReplaceOriginal(originalPath, finalPath)
-                }
-            }
-            .setNegativeButton("跳过") { _, _ ->
-                // 直接询问是否替换原图
-                askReplaceOriginal(originalPath, editedPath)
-            }
-            .setNeutralButton("取消") { _, _ ->
-                // 取消时删除临时文件
-                try {
-                    File(editedPath).delete()
-                } catch (e: Exception) {
-                    Log.e("ImageEditActivity", "删除临时文件失败", e)
-                }
-            }
-            .show()
+        // 直接询问是否替换原图（不再自动询问清除手写笔记）
+        askReplaceOriginal(originalPath, editedPath)
         }
     }
     

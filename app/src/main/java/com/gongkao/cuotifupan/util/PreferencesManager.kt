@@ -2,6 +2,7 @@ package com.gongkao.cuotifupan.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.appcompat.app.AlertDialog
 
 /**
  * SharedPreferences 管理类
@@ -162,6 +163,102 @@ object PreferencesManager {
         } catch (e: Exception) {
             emptyList()
         }
+    }
+    
+    /**
+     * 获取清除对错痕迹提示的显示次数
+     */
+    fun getClearMarksHintCount(context: Context): Int {
+        return getPrefs(context).getInt("clear_marks_hint_count", 0)
+    }
+    
+    /**
+     * 增加清除对错痕迹提示的显示次数
+     */
+    fun incrementClearMarksHintCount(context: Context) {
+        val currentCount = getClearMarksHintCount(context)
+        getPrefs(context).edit().putInt("clear_marks_hint_count", currentCount + 1).apply()
+    }
+    
+    /**
+     * 是否应该显示清除对错痕迹的提示（前5次显示）
+     */
+    fun shouldShowClearMarksHint(context: Context): Boolean {
+        return getClearMarksHintCount(context) < 5
+    }
+    
+    /**
+     * 通用的页面提示管理
+     */
+    
+    /**
+     * 获取指定页面的提示显示次数
+     */
+    fun getPageHintCount(context: Context, pageKey: String): Int {
+        return getPrefs(context).getInt("page_hint_count_$pageKey", 0)
+    }
+    
+    /**
+     * 增加指定页面的提示显示次数
+     */
+    fun incrementPageHintCount(context: Context, pageKey: String) {
+        val currentCount = getPageHintCount(context, pageKey)
+        getPrefs(context).edit().putInt("page_hint_count_$pageKey", currentCount + 1).apply()
+    }
+    
+    /**
+     * 是否应该显示指定页面的提示（前3次显示）
+     */
+    fun shouldShowPageHint(context: Context, pageKey: String, maxCount: Int = 3): Boolean {
+        return getPageHintCount(context, pageKey) < maxCount
+    }
+    
+    /**
+     * 页面提示的Key常量
+     */
+    object PageKeys {
+        const val MAIN = "main"
+        const val HANDWRITING_NOTE = "handwriting_note"
+        const val IMAGE_EDIT = "image_edit"
+        const val QUESTION_DETAIL = "question_detail"
+        const val FLASHCARD_REVIEW = "flashcard_review"
+        const val SCREEN_HANDWRITING = "screen_handwriting"
+        const val MANUAL_IMPORT = "manual_import"
+        const val CAMERA_CAPTURE = "camera_capture"
+        const val NOTES_LIST = "notes_list"
+        const val FLASHCARDS_LIST = "flashcards_list"
+    }
+    
+    /**
+     * 显示页面使用提示（如果应该显示）
+     * @param context Activity上下文
+     * @param pageKey 页面标识（使用PageKeys常量）
+     * @param title 提示标题
+     * @param message 提示内容
+     * @param maxCount 最多显示次数，默认3次
+     * @return 如果显示了提示对话框，返回true；否则返回false
+     */
+    fun showPageHintIfNeeded(
+        context: Context,
+        pageKey: String,
+        title: String,
+        message: String,
+        maxCount: Int = 3
+    ): Boolean {
+        if (!shouldShowPageHint(context, pageKey, maxCount)) {
+            return false
+        }
+        
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("知道了") { _, _ ->
+                incrementPageHintCount(context, pageKey)
+            }
+            .setCancelable(true)
+            .show()
+        
+        return true
     }
 }
 

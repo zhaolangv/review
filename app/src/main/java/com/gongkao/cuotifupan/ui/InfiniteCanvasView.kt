@@ -262,41 +262,78 @@ class InfiniteCanvasView @JvmOverloads constructor(
     ) {
         if (text.isBlank()) return
         
-        // 计算位置（使用当前图层的最后一个笔画位置）
-        val bounds = calculateLastStrokeBounds()
+        // 获取当前图层ID
+        val currentLayerId = layerManager?.getCurrentLayer()?.id ?: 1
+        val currentLayer = layerManager?.getCurrentLayer()
+        
+        // 获取当前图层的所有未识别笔画（这些笔画将被关联到这个文字）
+        val associatedStrokes = mutableListOf<Stroke>()
+        if (currentLayer != null) {
+            // 检查每个笔画是否还在图层中（防止在识别期间被橡皮擦删除）
+            val strokesToCheck = currentLayer.strokes.toList() // 创建副本避免并发修改
+            strokesToCheck.forEach { stroke ->
+                // 检查笔画是否还在图层中（可能已被橡皮擦删除）
+                if (currentLayer.strokes.contains(stroke) && !recognizedStrokes.contains(stroke)) {
+                    recognizedStrokes.add(stroke)
+                    associatedStrokes.add(stroke)
+                }
+            }
+        }
+        
+        // 如果所有用于识别的笔画都已被擦除，不添加文字
+        if (associatedStrokes.isEmpty()) {
+            Log.d("InfiniteCanvasView", "识别完成，但所有笔画都已被擦除，不添加文字: $text")
+            return
+        }
+        
+        // 计算位置（使用关联的笔画位置）
+        val bounds = calculateBoundsForStrokes(associatedStrokes)
         val x: Float
         val y: Float
         val finalFontSize: Float
         
         if (bounds != null) {
-            // 使用实际笔画的高度作为字体大小（精确匹配）
-            val strokeHeight = (bounds.bottom - bounds.top).toFloat()
-            finalFontSize = if (fontSize > 0f) fontSize else {
-                // 字体大小 = 笔画高度，完全匹配
-                max(20f, strokeHeight).coerceIn(20f, 200f)
+            // 计算平均笔画宽度（考虑 strokeWidth）
+            val avgStrokeWidth = associatedStrokes.map { it.paint.strokeWidth }.average().toFloat()
+            
+            // 计算手写的实际视觉高度
+            // 注意：bounds 已经在 calculateBoundsForStrokes 中考虑了 strokeWidth（扩展了 halfStrokeWidth），
+            // 所以这里直接使用 bounds.bottom - bounds.top 即可，不需要再加 avgStrokeWidth
+            val visualStrokeHeight = (bounds.bottom - bounds.top).toFloat()
+            
+            // 添加调试日志
+            Log.d("InfiniteCanvasView", "计算字体大小: 文字='$text', 笔画高度=${String.format("%.1f", visualStrokeHeight)}, avgStrokeWidth=${String.format("%.1f", avgStrokeWidth)}, bounds=(${bounds.left}, ${bounds.top}, ${bounds.right}, ${bounds.bottom})")
+            
+            // 计算匹配手写高度的字体大小
+            finalFontSize = if (fontSize > 0f) {
+                fontSize
+            } else {
+                // 使用二分法或迭代法找到合适的 textSize，使得文字的视觉高度等于手写的视觉高度
+                val calculatedSize = calculateFontSizeToMatchHeight(text, visualStrokeHeight, typeface)
+                Log.d("InfiniteCanvasView", "计算出的字体大小: ${String.format("%.1f", calculatedSize)}")
+                calculatedSize
             }
             
-            // 使用笔画的左上角位置（精确对齐）
+            // X 位置：使用笔画左边界（bounds已经包含了扩展，所以直接使用）
             x = bounds.left.toFloat()
-            // y 位置：使用笔画顶部 + 字体大小（文字基线在底部）
-            // 为了让文字顶部和笔画顶部对齐
-            y = bounds.top.toFloat() + finalFontSize
+            
+            // Y 位置计算：文字的基线在 y 坐标上，我们需要让文字顶部对齐笔画顶部
+            val tempPaint = Paint(textPaint).apply {
+                textSize = finalFontSize
+                this.typeface = typeface ?: android.graphics.Typeface.DEFAULT
+            }
+            val textBounds = Rect()
+            tempPaint.getTextBounds(text, 0, text.length, textBounds)
+            
+            // 文字的视觉高度 = textBounds.bottom - textBounds.top
+            // 文字顶部到基线的距离 = -textBounds.top（textBounds.top 是负数）
+            val textTopToBaseline = if (textBounds.top < 0) -textBounds.top.toFloat() else finalFontSize * 0.8f
+            // y 坐标是基线位置，所以 y = 笔画顶部 + 文字顶部到基线的距离
+            y = bounds.top.toFloat() + textTopToBaseline
         } else {
             finalFontSize = if (fontSize > 0f) fontSize else 60f
             x = 20f
             y = finalFontSize
-        }
-        
-        // 获取当前图层ID
-        val currentLayerId = layerManager?.getCurrentLayer()?.id ?: 1
-        
-        // 获取当前图层的所有未识别笔画（这些笔画将被关联到这个文字）
-        val associatedStrokes = mutableListOf<Stroke>()
-        layerManager?.getCurrentLayer()?.strokes?.forEach { stroke ->
-            if (!recognizedStrokes.contains(stroke)) {
-                recognizedStrokes.add(stroke)
-                associatedStrokes.add(stroke)
-            }
         }
         
         // 创建 RecognizedText 并关联笔画
@@ -306,6 +343,153 @@ class InfiniteCanvasView @JvmOverloads constructor(
         currentStrokePoints.clear()
         
         invalidate()
+    }
+    
+    /**
+     * 计算匹配指定视觉高度的字体大小
+     * 使用 Paint.ascent() 和 Paint.descent() 来更准确地计算文字的视觉高度
+     * @param text 要测量的文字
+     * @param targetHeight 目标视觉高度
+     * @param typeface 字体
+     * @return 匹配的字体大小
+     */
+    private fun calculateFontSizeToMatchHeight(text: String, targetHeight: Float, typeface: android.graphics.Typeface?): Float {
+        if (targetHeight <= 0) return 60f
+        
+        val testPaint = Paint(textPaint).apply {
+            this.typeface = typeface ?: android.graphics.Typeface.DEFAULT
+        }
+        
+        // 使用二分法找到合适的 textSize
+        var minSize = 5f
+        var maxSize = 500f
+        // 对于中文字符，textSize 通常需要比目标高度稍大一些（1.1-1.3倍）
+        // 所以初始值设为目标高度的 1.2 倍
+        var currentSize = targetHeight * 1.2f
+        
+        // 最多迭代30次，提高精度
+        for (i in 0..29) {
+            testPaint.textSize = currentSize
+            
+            // 使用 Paint.ascent() 和 Paint.descent() 计算实际的文字视觉高度
+            // ascent 是负数（向上），descent 是正数（向下）
+            // 视觉高度 = descent - ascent
+            val ascent = testPaint.ascent()
+            val descent = testPaint.descent()
+            val textVisualHeight = descent - ascent
+            
+            // 如果误差小于0.5像素，认为匹配成功
+            if (kotlin.math.abs(textVisualHeight - targetHeight) < 0.5f) {
+                Log.d("InfiniteCanvasView", "字体大小匹配成功: textSize=${String.format("%.2f", currentSize)}, 文字高度=${String.format("%.2f", textVisualHeight)}, 目标高度=${String.format("%.2f", targetHeight)}, 迭代次数=${i + 1}")
+                return currentSize.coerceIn(5f, 500f)
+            }
+            
+            // 调整 textSize
+            if (textVisualHeight < targetHeight) {
+                // 文字太小，增大 textSize
+                minSize = currentSize
+                currentSize = (currentSize + maxSize) / 2f
+            } else {
+                // 文字太大，减小 textSize
+                maxSize = currentSize
+                currentSize = (minSize + currentSize) / 2f
+            }
+            
+            // 如果 minSize 和 maxSize 太接近，退出循环
+            if (maxSize - minSize < 0.05f) {
+                testPaint.textSize = currentSize
+                val finalAscent = testPaint.ascent()
+                val finalDescent = testPaint.descent()
+                val finalHeight = finalDescent - finalAscent
+                Log.d("InfiniteCanvasView", "字体大小匹配完成（接近）: textSize=${String.format("%.2f", currentSize)}, 文字高度=${String.format("%.2f", finalHeight)}, 目标高度=${String.format("%.2f", targetHeight)}, 迭代次数=${i + 1}")
+                break
+            }
+        }
+        
+        // 最终测量一次
+        testPaint.textSize = currentSize
+        val finalAscent = testPaint.ascent()
+        val finalDescent = testPaint.descent()
+        val finalTextHeight = finalDescent - finalAscent
+        Log.d("InfiniteCanvasView", "字体大小计算完成: textSize=${String.format("%.2f", currentSize)}, 文字高度=${String.format("%.2f", finalTextHeight)}, 目标高度=${String.format("%.2f", targetHeight)}")
+        
+        // 暂时不限制上限，让字体大小可以匹配大字的识别
+        // 但添加合理性检查：如果计算出的字体大小明显异常（>1000），可能是计算错误
+        if (currentSize > 1000f) {
+            Log.w("InfiniteCanvasView", "字体大小异常大(${String.format("%.2f", currentSize)})，可能是计算错误，使用目标高度的1.2倍作为字体大小")
+            return (targetHeight * 1.2f).coerceIn(5f, 200f)
+        }
+        return currentSize.coerceIn(5f, 2000f)
+    }
+    
+    /**
+     * 计算指定笔画的边界（考虑 strokeWidth）
+     * 使用原始路径边界，但扩展时更保守，避免过度放大
+     */
+    private fun calculateBoundsForStrokes(strokes: List<Stroke>): Rect? {
+        if (strokes.isEmpty()) return null
+        
+        // 使用 null 初始化，避免 Float.MIN_VALUE 的问题（Float.MIN_VALUE 是最小的正数，不是最小的负数）
+        var minX: Float? = null
+        var minY: Float? = null
+        var maxX: Float? = null
+        var maxY: Float? = null
+        
+        strokes.forEach { stroke ->
+            val bounds = RectF()
+            stroke.path.computeBounds(bounds, true)
+            
+            // 添加详细日志
+            Log.d("InfiniteCanvasView", "路径边界: left=${bounds.left}, top=${bounds.top}, right=${bounds.right}, bottom=${bounds.bottom}, width=${bounds.width()}, height=${bounds.height()}, strokeWidth=${stroke.paint.strokeWidth}")
+            
+            // 如果边界无效，跳过
+            if (bounds.width() <= 0 || bounds.height() <= 0) {
+                Log.w("InfiniteCanvasView", "路径边界无效，跳过")
+                return@forEach
+            }
+            
+            // 直接使用原始边界，不扩展（因为手写字体很小，扩展会导致过大）
+            // 只使用路径本身的边界，不添加 strokeWidth 扩展
+            val left = bounds.left
+            val top = bounds.top
+            val right = bounds.right
+            val bottom = bounds.bottom
+            
+            // 更新最小值和最大值（使用临时变量避免智能转换问题）
+            val currentMinX = minX
+            val currentMinY = minY
+            val currentMaxX = maxX
+            val currentMaxY = maxY
+            
+            minX = if (currentMinX == null) left else minOf(currentMinX, left)
+            minY = if (currentMinY == null) top else minOf(currentMinY, top)
+            maxX = if (currentMaxX == null) right else maxOf(currentMaxX, right)
+            maxY = if (currentMaxY == null) bottom else maxOf(currentMaxY, bottom)
+        }
+        
+        // 检查是否至少有一个有效的边界
+        if (minX == null || minY == null || maxX == null || maxY == null) {
+            Log.w("InfiniteCanvasView", "没有有效的路径边界")
+            return null
+        }
+        
+        // 将可空变量赋值给非空变量，避免智能转换问题
+        val finalMinX = minX!!
+        val finalMinY = minY!!
+        val finalMaxX = maxX!!
+        val finalMaxY = maxY!!
+        
+        // 检查最终边界是否有效
+        if (finalMinX >= finalMaxX || finalMinY >= finalMaxY) {
+            Log.w("InfiniteCanvasView", "最终边界无效: minX=$finalMinX, minY=$finalMinY, maxX=$finalMaxX, maxY=$finalMaxY")
+            return null
+        }
+        
+        val finalBounds = Rect(finalMinX.toInt(), finalMinY.toInt(), finalMaxX.toInt(), finalMaxY.toInt())
+        val actualHeight = finalMaxY - finalMinY
+        Log.d("InfiniteCanvasView", "最终边界: $finalBounds, 实际高度=${String.format("%.2f", actualHeight)}")
+        
+        return finalBounds
     }
     
     /**

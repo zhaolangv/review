@@ -10,7 +10,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 /**
  * Room 数据库
  */
-@Database(entities = [Question::class, ExcludedImage::class, StandaloneNote::class, StandaloneFlashcard::class, MathPracticeSession::class, ScannedImage::class, FlashcardDeck::class], version = 13, exportSchema = false)
+@Database(entities = [Question::class, ExcludedImage::class, StandaloneNote::class, StandaloneFlashcard::class, MathPracticeSession::class, ScannedImage::class, FlashcardDeck::class], version = 14, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     
     abstract fun questionDao(): QuestionDao
@@ -32,7 +32,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "snap_review_database"
                 )
-                .addMigrations(MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_14_13)
+                .addMigrations(MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_13)
                 .build()
                 INSTANCE = instance
                 instance
@@ -115,6 +115,16 @@ abstract class AppDatabase : RoomDatabase() {
                 // 添加正面和背面图片路径字段
                 database.execSQL("ALTER TABLE standalone_flashcards ADD COLUMN frontImagePath TEXT")
                 database.execSQL("ALTER TABLE standalone_flashcards ADD COLUMN backImagePath TEXT")
+            }
+        }
+        
+        /**
+         * 数据库迁移：从版本13到版本14
+         * 添加 hiddenOptionsImagePath 字段（清除对错痕迹功能）
+         */
+        private val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE questions ADD COLUMN hiddenOptionsImagePath TEXT")
             }
         }
         

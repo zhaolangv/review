@@ -14,6 +14,7 @@ import com.gongkao.cuotifupan.data.AppDatabase
 import com.gongkao.cuotifupan.data.Question
 import com.gongkao.cuotifupan.data.StandaloneFlashcard
 import com.gongkao.cuotifupan.util.SpacedRepetitionAlgorithm
+import com.gongkao.cuotifupan.util.PreferencesManager
 import com.gongkao.cuotifupan.viewmodel.QuestionViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

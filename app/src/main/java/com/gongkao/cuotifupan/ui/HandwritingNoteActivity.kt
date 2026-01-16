@@ -31,6 +31,7 @@ import java.io.File
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import com.gongkao.cuotifupan.util.PreferencesManager
 
 /**
  * 手写笔记模式 Activity
@@ -147,6 +148,126 @@ class HandwritingNoteActivity : AppCompatActivity() {
         if (isWritingMode) {
             questionImageView.setZoomable(false)
             questionImageView.setOnTouchListener { _, _ -> true } // 阻止PhotoView处理触摸事件
+        }
+        
+        // 为按钮添加长按功能说明
+        setupButtonHints()
+    }
+    
+    /**
+     * 为按钮添加长按功能说明
+     */
+    private fun setupButtonHints() {
+        // 顶部工具栏按钮
+        btnBack.setOnLongClickListener {
+            Toast.makeText(this, "返回：退出手写笔记页面", Toast.LENGTH_SHORT).show()
+            true
+        }
+        btnUndo.setOnLongClickListener {
+            Toast.makeText(this, "撤销：撤销上一步操作", Toast.LENGTH_SHORT).show()
+            true
+        }
+        btnRedo.setOnLongClickListener {
+            Toast.makeText(this, "重做：恢复刚才撤销的操作", Toast.LENGTH_SHORT).show()
+            true
+        }
+        btnClear.setOnLongClickListener {
+            Toast.makeText(this, "清除：清除当前图层的内容", Toast.LENGTH_SHORT).show()
+            true
+        }
+        findViewById<ImageButton>(R.id.btnPen)?.setOnLongClickListener {
+            Toast.makeText(this, "画笔：选择画笔工具，可以在图片上书写", Toast.LENGTH_SHORT).show()
+            true
+        }
+        
+        // 底部工具栏按钮
+        btnPencilToggle.setOnLongClickListener {
+            Toast.makeText(this, "笔触开关：开启后笔迹会有粗细变化，关闭后笔迹粗细一致", Toast.LENGTH_SHORT).show()
+            true
+        }
+        btnBeautifyToggle.setOnLongClickListener {
+            Toast.makeText(this, "实时美化：开启后，抬笔后会自动识别手写内容并转换为整洁的文字", Toast.LENGTH_SHORT).show()
+            true
+        }
+        btnEraserBottom.setOnLongClickListener {
+            Toast.makeText(this, "橡皮擦：选择橡皮擦工具，可以擦除已写的内容。再次点击可调整橡皮擦大小", Toast.LENGTH_SHORT).show()
+            true
+        }
+        btnLayer.setOnLongClickListener {
+            Toast.makeText(this, "图层管理：可以创建多个图层，每个图层可以独立显示/隐藏、删除", Toast.LENGTH_SHORT).show()
+            true
+        }
+        btnLassoBottom.setOnLongClickListener {
+            Toast.makeText(this, "套索工具：可以选择、移动、删除已写的内容。可以选择自由形状、矩形或圆形区域", Toast.LENGTH_SHORT).show()
+            true
+        }
+        btnModeToggle.setOnLongClickListener {
+            Toast.makeText(this, "模式切换：在书写模式和查看模式之间切换。查看模式下可以缩放和移动图片", Toast.LENGTH_SHORT).show()
+            true
+        }
+        btnFont.setOnLongClickListener {
+            Toast.makeText(this, "字体选择：选择实时美化后的文字字体样式（常规、粗体、优雅、书法）", Toast.LENGTH_SHORT).show()
+            true
+        }
+        
+        // 图层面板按钮
+        btnAddLayer.setOnLongClickListener {
+            Toast.makeText(this, "添加图层：创建一个新的图层", Toast.LENGTH_SHORT).show()
+            true
+        }
+        btnRemoveLayer.setOnLongClickListener {
+            Toast.makeText(this, "删除图层：删除当前选中的图层", Toast.LENGTH_SHORT).show()
+            true
+        }
+        
+        // 套索模式按钮
+        findViewById<Button>(R.id.btnLassoFreehand)?.setOnLongClickListener {
+            Toast.makeText(this, "自由形状：用手指自由绘制选择区域", Toast.LENGTH_SHORT).show()
+            true
+        }
+        findViewById<Button>(R.id.btnLassoRectangle)?.setOnLongClickListener {
+            Toast.makeText(this, "矩形：拖动绘制矩形选择区域", Toast.LENGTH_SHORT).show()
+            true
+        }
+        findViewById<Button>(R.id.btnLassoCircle)?.setOnLongClickListener {
+            Toast.makeText(this, "圆形：拖动绘制圆形选择区域", Toast.LENGTH_SHORT).show()
+            true
+        }
+        
+        // 橡皮擦大小按钮
+        findViewById<Button>(R.id.btnEraserSmall)?.setOnLongClickListener {
+            Toast.makeText(this, "小号橡皮擦：适合擦除细节", Toast.LENGTH_SHORT).show()
+            true
+        }
+        findViewById<Button>(R.id.btnEraserMedium)?.setOnLongClickListener {
+            Toast.makeText(this, "中号橡皮擦：适合一般擦除", Toast.LENGTH_SHORT).show()
+            true
+        }
+        findViewById<Button>(R.id.btnEraserLarge)?.setOnLongClickListener {
+            Toast.makeText(this, "大号橡皮擦：适合大面积擦除", Toast.LENGTH_SHORT).show()
+            true
+        }
+        findViewById<Button>(R.id.btnEraserXLarge)?.setOnLongClickListener {
+            Toast.makeText(this, "超大号橡皮擦：适合擦除整块内容", Toast.LENGTH_SHORT).show()
+            true
+        }
+        
+        // 字体选择按钮
+        findViewById<Button>(R.id.btnFontRegular)?.setOnLongClickListener {
+            Toast.makeText(this, "常规字体：标准的文字样式", Toast.LENGTH_SHORT).show()
+            true
+        }
+        findViewById<Button>(R.id.btnFontBold)?.setOnLongClickListener {
+            Toast.makeText(this, "粗体：加粗的文字样式", Toast.LENGTH_SHORT).show()
+            true
+        }
+        findViewById<Button>(R.id.btnFontElegant)?.setOnLongClickListener {
+            Toast.makeText(this, "优雅字体：优美的文字样式", Toast.LENGTH_SHORT).show()
+            true
+        }
+        findViewById<Button>(R.id.btnFontCalligraphy)?.setOnLongClickListener {
+            Toast.makeText(this, "书法字体：书法风格的文字样式", Toast.LENGTH_SHORT).show()
+            true
         }
     }
     

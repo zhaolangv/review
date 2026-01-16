@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.gongkao.cuotifupan.R
 import com.gongkao.cuotifupan.api.HandwritingRecognitionService
+import com.gongkao.cuotifupan.util.PreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

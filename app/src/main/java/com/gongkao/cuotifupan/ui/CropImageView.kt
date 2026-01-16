@@ -649,6 +649,11 @@ class CropImageView @JvmOverloads constructor(
      */
     fun enterCropMode() {
         setCropMode(true)
+        // 如果进入裁剪模式时没有裁剪框，自动创建一个初始裁剪框
+        if (cropMode && cropRects.isEmpty() && bitmap != null && bitmapRect.width() > 0 && bitmapRect.height() > 0) {
+            Log.d("CropImageView", "进入裁剪模式，自动创建初始裁剪框")
+            addCropRect()
+        }
     }
     
     /**

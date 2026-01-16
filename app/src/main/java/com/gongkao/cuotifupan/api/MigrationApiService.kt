@@ -65,6 +65,7 @@ data class QuestionMigrationData(
     val imagePath: String,
     val originalImagePath: String?,
     val cleanedImagePath: String?,
+    val hiddenOptionsImagePath: String?,
     val rawText: String,
     val questionText: String,
     val frontendRawText: String?,

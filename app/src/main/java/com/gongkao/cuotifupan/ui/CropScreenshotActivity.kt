@@ -153,7 +153,7 @@ class CropScreenshotActivity : AppCompatActivity() {
                     createQuestion(savedPath)
                     
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(this@CropScreenshotActivity, "题目已导入", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@CropScreenshotActivity, "✅ 题目已成功导入！", Toast.LENGTH_LONG).show()
                         croppedBitmap.recycle()
                         finish()
                     }

@@ -21,6 +21,9 @@ data class Question(
     // 擦写后的图片路径（如果存在，说明已擦写过）
     val cleanedImagePath: String? = null,
     
+    // 清除对错痕迹后的图片路径（如果存在，说明已清除过对错痕迹）
+    val hiddenOptionsImagePath: String? = null,
+    
     // 标注图层路径（PNG透明背景，独立于原图）
     val annotationPath: String? = null,
     
