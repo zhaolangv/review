@@ -14,6 +14,21 @@
         android:padding="16dp"
         android:minHeight="72dp">
 
+        <!-- 展开/折叠图标（类似 Anki，只有有子卡包时显示） -->
+        <TextView
+            android:id="@+id/expandIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textColor="@color/text_secondary"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="展开/折叠"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
         <TextView
             android:id="@+id/deckNameText"
             android:layout_width="0dp"
@@ -21,8 +36,10 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/expandIcon"
             app:layout_constraintEnd_toStartOf="@id/cardCountText"
             app:layout_constraintBottom_toBottomOf="parent" />
 
@@ -32,7 +49,19 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textColor="@color/text_secondary"
-            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/menuButton"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- 操作菜单按钮（类似 Anki 的三个点或齿轮图标） -->
+        <ImageButton
+            android:id="@+id/menuButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_more"
+            android:contentDescription="操作菜单"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />

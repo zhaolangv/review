@@ -124,6 +124,9 @@ class ScreenHandwritingActivity : AppCompatActivity() {
 
         // 初始字体
         updateRecognizedTextFont()
+
+        // Initialize runtime pencil mode switch (no XML changes)
+        initPencilModeSwitcher()
     }
     
     /**
@@ -369,6 +372,18 @@ class ScreenHandwritingActivity : AppCompatActivity() {
         }
     }
 
+    private fun initPencilModeSwitcher() {
+        try {
+            val toolbar = findViewById<LinearLayout>(R.id.toolbar)
+            val layout = LinearLayout(this).apply { orientation = android.widget.LinearLayout.HORIZONTAL; gravity = android.view.Gravity.CENTER_VERTICAL }
+            val label = TextView(this).apply { text = "笔触模式"; textSize = 12f; setTextColor(android.graphics.Color.parseColor("#666666")) }
+            val sw = Switch(this).apply { isChecked = false; setOnCheckedChangeListener { _, isChecked -> handwritingView.setPencilModeEnabled(isChecked) } }
+            layout.addView(label)
+            layout.addView(sw)
+            toolbar?.addView(layout)
+        } catch (e: Exception) { /* ignore */ }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         // 清理回调
@@ -377,4 +392,5 @@ class ScreenHandwritingActivity : AppCompatActivity() {
         }
     }
 }
+
 

@@ -882,7 +882,7 @@ class ImageEditActivity : AppCompatActivity() {
         }
         
         // 直接询问是否替换原图（不再自动询问清除手写笔记）
-        askReplaceOriginal(originalPath, editedPath)
+                askReplaceOriginal(originalPath, editedPath)
         }
     }
     

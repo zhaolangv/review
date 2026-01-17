@@ -105,9 +105,13 @@ class MathPracticeFragment : Fragment() {
                 return@setOnClickListener
             }
             
-            android.util.Log.d("MathPracticeFragment", "启动练习: ${selectedPracticeType!!.name}, 数量: $count")
+            // 获取答题模式
+            val answerModeRadioGroup = view.findViewById<android.widget.RadioGroup>(R.id.answerModeRadioGroup)
+            val showAfterAll = answerModeRadioGroup.checkedRadioButtonId == R.id.modeShowAfterAllRadio
+            
+            android.util.Log.d("MathPracticeFragment", "启动练习: ${selectedPracticeType!!.name}, 数量: $count, 模式: ${if (showAfterAll) "全部做完后显示" else "每做一道就显示"}")
             try {
-                startPractice(selectedPracticeType!!, count)
+                startPractice(selectedPracticeType!!, count, showAfterAll)
                 android.util.Log.d("MathPracticeFragment", "已调用startPractice")
             } catch (e: Exception) {
                 android.util.Log.e("MathPracticeFragment", "启动练习失败", e)
@@ -290,12 +294,13 @@ class MathPracticeFragment : Fragment() {
         }
     }
     
-    private fun startPractice(type: PracticeType, count: Int) {
+    private fun startPractice(type: PracticeType, count: Int, showAfterAll: Boolean = true) {
         try {
-            android.util.Log.d("MathPracticeFragment", "创建Intent: type=${type.name}, count=$count")
+            android.util.Log.d("MathPracticeFragment", "创建Intent: type=${type.name}, count=$count, showAfterAll=$showAfterAll")
             val intent = Intent(requireContext(), MathPracticeActivity::class.java).apply {
                 putExtra("practice_type", type.name)
                 putExtra("question_count", count)
+                putExtra("show_after_all", showAfterAll)
             }
             android.util.Log.d("MathPracticeFragment", "启动Activity")
             startActivity(intent)

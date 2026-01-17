@@ -143,6 +143,7 @@ class FlashcardEditActivity : AppCompatActivity() {
             frontImageView.visibility = ImageView.GONE
             frontImageDeleteButton.visibility = Button.GONE
             frontImageView.setImageBitmap(null)
+            updateImageButtonText()
             checkForChanges()
         }
         
@@ -151,6 +152,7 @@ class FlashcardEditActivity : AppCompatActivity() {
             backImageView.visibility = ImageView.GONE
             backImageDeleteButton.visibility = Button.GONE
             backImageView.setImageBitmap(null)
+            updateImageButtonText()
             checkForChanges()
         }
         
@@ -227,8 +229,10 @@ class FlashcardEditActivity : AppCompatActivity() {
                     deckEditText.setText(deckName)
                     
                     // 加载图片
-                    loadImage(frontImagePath, frontImageView, frontImageDeleteButton)
-                    loadImage(backImagePath, backImageView, backImageDeleteButton)
+                    loadImage(frontImagePath, frontImageView, frontImageDeleteButton, frontImageButton)
+                    loadImage(backImagePath, backImageView, backImageDeleteButton, backImageButton)
+                    // 更新按钮文本
+                    updateImageButtonText()
                     
                     hasUnsavedChanges = false
                 }
@@ -262,12 +266,34 @@ class FlashcardEditActivity : AppCompatActivity() {
                 val imagePath = saveImageFromUri(uri)
                 if (imagePath != null) {
                     if (isSelectingFrontImage) {
+                        // 如果背面已有图片，先删除
+                        if (backImagePath != null) {
+                            val oldBackImagePath = backImagePath
+                            backImagePath = null
+                            backImageView.visibility = ImageView.GONE
+                            backImageDeleteButton.visibility = Button.GONE
+                            backImageView.setImageBitmap(null)
+                            // 删除旧文件
+                            oldBackImagePath?.let { File(it).delete() }
+                        }
                         frontImagePath = imagePath
-                        loadImage(imagePath, frontImageView, frontImageDeleteButton)
+                        loadImage(imagePath, frontImageView, frontImageDeleteButton, frontImageButton)
                     } else {
+                        // 如果正面已有图片，先删除
+                        if (frontImagePath != null) {
+                            val oldFrontImagePath = frontImagePath
+                            frontImagePath = null
+                            frontImageView.visibility = ImageView.GONE
+                            frontImageDeleteButton.visibility = Button.GONE
+                            frontImageView.setImageBitmap(null)
+                            // 删除旧文件
+                            oldFrontImagePath?.let { File(it).delete() }
+                        }
                         backImagePath = imagePath
-                        loadImage(imagePath, backImageView, backImageDeleteButton)
+                        loadImage(imagePath, backImageView, backImageDeleteButton, backImageButton)
                     }
+                    // 更新另一面的按钮文本
+                    updateImageButtonText()
                     checkForChanges()
                 } else {
                     Toast.makeText(this@FlashcardEditActivity, "保存图片失败", Toast.LENGTH_SHORT).show()
@@ -316,7 +342,7 @@ class FlashcardEditActivity : AppCompatActivity() {
     /**
      * 加载并显示图片
      */
-    private fun loadImage(imagePath: String?, imageView: ImageView, deleteButton: Button) {
+    private fun loadImage(imagePath: String?, imageView: ImageView, deleteButton: Button, imageButton: Button) {
         if (imagePath != null && File(imagePath).exists()) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val bitmap = BitmapFactory.decodeFile(imagePath)
@@ -324,42 +350,93 @@ class FlashcardEditActivity : AppCompatActivity() {
                     imageView.setImageBitmap(bitmap)
                     imageView.visibility = ImageView.VISIBLE
                     deleteButton.visibility = Button.VISIBLE
+                    // 更新按钮文本为"更换图片"
+                    imageButton.text = "更换图片"
                 }
             }
         } else {
             imageView.visibility = ImageView.GONE
             deleteButton.visibility = Button.GONE
+            // 更新按钮文本为"添加图片"
+            imageButton.text = "添加图片"
         }
+    }
+    
+    /**
+     * 更新图片按钮文本
+     */
+    private fun updateImageButtonText() {
+        frontImageButton.text = if (frontImagePath != null) "更换图片" else "添加图片"
+        backImageButton.text = if (backImagePath != null) "更换图片" else "添加图片"
     }
     
     private fun showDeckSelectDialog() {
         lifecycleScope.launch {
             val database = AppDatabase.getDatabase(this@FlashcardEditActivity)
-            val decks = withContext(Dispatchers.IO) {
-                database.flashcardDeckDao().getRootDecksSync()
+            
+            // 获取所有卡包（包括子卡包）
+            val allDecks = withContext(Dispatchers.IO) {
+                database.flashcardDeckDao().getAllDecksSync()
             }
             
-            val deckNames = listOf("未分类") + decks.map { it.name }
-            val deckIds = listOf<String?>(null) + decks.map { it.id }
+            // 构建卡包ID到卡包对象的映射（用于快速查找父卡包）
+            val deckMap = allDecks.associateBy { it.id }
+            
+            /**
+             * 获取卡包的完整路径（如 "父卡包 > 子卡包 > 孙卡包"）
+             */
+            fun getDeckPath(deck: FlashcardDeck): String {
+                val pathParts = mutableListOf<String>()
+                var currentDeck: FlashcardDeck? = deck
+                
+                // 向上查找所有父卡包
+                while (currentDeck != null) {
+                    pathParts.add(0, currentDeck.name) // 插入到开头
+                    val parentId = currentDeck.parentId
+                    currentDeck = if (parentId != null) deckMap[parentId] else null
+                }
+                
+                return pathParts.joinToString(" > ")
+            }
+            
+            // 为每个卡包构建显示名称（包含路径）
+            val deckItems = allDecks.map { deck ->
+                val path = getDeckPath(deck)
+                // 如果路径和名称相同（即根卡包），只显示名称；否则显示完整路径
+                val displayName = if (path == deck.name) deck.name else path
+                Pair(displayName, deck)
+            }
+            
+            // 按路径排序（保持层级关系）
+            val sortedDeckItems = deckItems.sortedBy { it.first }
+            
+            // 构建显示列表：未分类 + 所有卡包
+            val displayNames = listOf("未分类") + sortedDeckItems.map { it.first }
+            val deckIds = listOf<String?>(null) + sortedDeckItems.map { it.second.id }
+            val decksList = listOf<FlashcardDeck?>(null) + sortedDeckItems.map { it.second }
             
             val currentIndex = if (currentDeckId == null) {
                 0
             } else {
-                deckIds.indexOf(currentDeckId) + 1
-            }.coerceAtLeast(0)
+                deckIds.indexOf(currentDeckId).coerceAtLeast(0)
+            }
             
             withContext(Dispatchers.Main) {
                 androidx.appcompat.app.AlertDialog.Builder(this@FlashcardEditActivity)
                     .setTitle("选择卡包")
-                    .setSingleChoiceItems(deckNames.toTypedArray(), currentIndex.coerceAtMost(deckNames.size - 1)) { dialog, which ->
+                    .setSingleChoiceItems(displayNames.toTypedArray(), currentIndex.coerceAtMost(displayNames.size - 1)) { dialog, which ->
                         if (which == 0) {
                             // 未分类
                             currentDeckId = null
                             deckEditText.setText("未分类")
                         } else {
-                            val selectedDeck = decks[which - 1]
-                            currentDeckId = selectedDeck.id
-                            deckEditText.setText(selectedDeck.name)
+                            val selectedDeck = decksList[which]
+                            if (selectedDeck != null) {
+                                currentDeckId = selectedDeck.id
+                                // 显示路径或名称
+                                val path = getDeckPath(selectedDeck)
+                                deckEditText.setText(if (path == selectedDeck.name) selectedDeck.name else path)
+                            }
                         }
                         checkForChanges()
                         dialog.dismiss()

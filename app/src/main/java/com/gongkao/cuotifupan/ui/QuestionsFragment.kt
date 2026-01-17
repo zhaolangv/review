@@ -85,6 +85,14 @@ class QuestionsFragment : Fragment() {
         cleanupInvalidQuestions()
     }
     
+    override fun onPause() {
+        super.onPause()
+        // 当Fragment失去焦点时（切换到其他页面），自动退出批量模式
+        if (isBatchMode) {
+            exitBatchMode()
+        }
+    }
+    
     /**
      * 清理图片文件已不存在的题目记录
      */

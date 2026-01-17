@@ -1,6 +1,9 @@
 package com.gongkao.cuotifupan.ui
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -11,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.gongkao.cuotifupan.R
 import com.gongkao.cuotifupan.data.AppDatabase
+import com.gongkao.cuotifupan.data.FlashcardDeck
 import com.gongkao.cuotifupan.data.Question
 import com.gongkao.cuotifupan.data.StandaloneFlashcard
 import com.gongkao.cuotifupan.util.SpacedRepetitionAlgorithm
@@ -42,12 +46,30 @@ class FlashcardReviewActivity : AppCompatActivity() {
     private var learningCardCount: Int = 0
     private var reviewCardCount: Int = 0
     
+    // 当前复习的卡包 ID（如果为 null，则复习所有卡包）
+    private var currentDeckId: String? = null
+    private var currentDeckName: String? = null
+    
+    // 显示模式：true=翻转模式，false=上下模式
+    private var isFlipMode: Boolean = true
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_flashcard_review)
         
+        // 获取传入的卡包 ID
+        currentDeckId = intent.getStringExtra("deck_id")
+        currentDeckName = intent.getStringExtra("deck_name")
+        
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "卡片复习"
+        supportActionBar?.title = if (currentDeckName != null) {
+            "复习：${currentDeckName}"
+        } else {
+            "卡片复习"
+        }
+        
+        // 加载显示模式
+        isFlipMode = PreferencesManager.getFlashcardDisplayMode(this)
         
         viewModel = ViewModelProvider(this)[QuestionViewModel::class.java]
         
@@ -60,7 +82,7 @@ class FlashcardReviewActivity : AppCompatActivity() {
         statsText = findViewById(R.id.statsText)
         
         // 设置 ViewPager
-        flashcardAdapter = FlashcardPagerAdapter()
+        flashcardAdapter = FlashcardPagerAdapter(isFlipMode)
         viewPager.adapter = flashcardAdapter
         viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         
@@ -97,18 +119,49 @@ class FlashcardReviewActivity : AppCompatActivity() {
             
             // 获取今日需要复习的卡片
             val dueCards = withContext(Dispatchers.IO) {
-                database.standaloneFlashcardDao().getDueCards(currentTime)
+                if (currentDeckId != null) {
+                    // 如果指定了卡包，只获取该卡包及其子卡包的卡片
+                    val allDeckIds = mutableListOf(currentDeckId!!)
+                    // 获取所有子卡包 ID
+                    allDeckIds.addAll(database.flashcardDeckDao().getAllDescendantDeckIds(currentDeckId!!))
+                    database.standaloneFlashcardDao().getDueCardsByDeckIds(allDeckIds, currentTime)
+                } else {
+                    // 获取所有需要复习的卡片
+                    database.standaloneFlashcardDao().getDueCards(currentTime)
+                }
             }
             
             // 获取统计信息
-            newCardCount = withContext(Dispatchers.IO) {
-                database.standaloneFlashcardDao().getNewCardCount()
+            val allDeckIds = if (currentDeckId != null) {
+                withContext(Dispatchers.IO) {
+                    val ids = mutableListOf(currentDeckId!!)
+                    ids.addAll(database.flashcardDeckDao().getAllDescendantDeckIds(currentDeckId!!))
+                    ids
+                }
+            } else {
+                null
             }
-            learningCardCount = withContext(Dispatchers.IO) {
-                database.standaloneFlashcardDao().getLearningCardCount()
-            }
-            reviewCardCount = withContext(Dispatchers.IO) {
-                database.standaloneFlashcardDao().getDueReviewCardCount(currentTime)
+            
+            if (allDeckIds != null) {
+                newCardCount = withContext(Dispatchers.IO) {
+                    database.standaloneFlashcardDao().getNewCardCountByDeckIds(allDeckIds)
+                }
+                learningCardCount = withContext(Dispatchers.IO) {
+                    database.standaloneFlashcardDao().getLearningCardCountByDeckIds(allDeckIds)
+                }
+                reviewCardCount = withContext(Dispatchers.IO) {
+                    database.standaloneFlashcardDao().getDueReviewCardCountByDeckIds(allDeckIds, currentTime)
+                }
+            } else {
+                newCardCount = withContext(Dispatchers.IO) {
+                    database.standaloneFlashcardDao().getNewCardCount()
+                }
+                learningCardCount = withContext(Dispatchers.IO) {
+                    database.standaloneFlashcardDao().getLearningCardCount()
+                }
+                reviewCardCount = withContext(Dispatchers.IO) {
+                    database.standaloneFlashcardDao().getDueReviewCardCount(currentTime)
+                }
             }
             
             // 转换为 FlashcardItem

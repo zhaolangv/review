@@ -156,6 +156,8 @@ class MainActivity : AppCompatActivity() {
     private fun switchFragment(fragment: Fragment) {
         try {
             Log.d("MainActivity", "切换Fragment: ${fragment.javaClass.simpleName}")
+            // 切换Fragment时自动隐藏批量操作按钮
+            hideBatchActionBar()
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, fragment)
                 .commit()

@@ -54,7 +54,13 @@ class MathPracticeHistoryActivity : AppCompatActivity() {
                 } else {
                     recyclerView.visibility = View.VISIBLE
                     emptyView.visibility = View.GONE
-                    recyclerView.adapter = MathPracticeHistoryAdapter(sessions)
+                    recyclerView.adapter = MathPracticeHistoryAdapter(sessions) { session ->
+                        // 点击历史记录，跳转到结果页面查看详情
+                        val intent = android.content.Intent(this@MathPracticeHistoryActivity, MathPracticeResultActivity::class.java).apply {
+                            putExtra("session_id", session.id)
+                        }
+                        startActivity(intent)
+                    }
                 }
             }
         }
@@ -62,7 +68,8 @@ class MathPracticeHistoryActivity : AppCompatActivity() {
 }
 
 class MathPracticeHistoryAdapter(
-    private val sessions: List<MathPracticeSession>
+    private val sessions: List<MathPracticeSession>,
+    private val onSessionClick: (MathPracticeSession) -> Unit
 ) : RecyclerView.Adapter<MathPracticeHistoryAdapter.HistoryViewHolder>() {
     
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
@@ -70,7 +77,7 @@ class MathPracticeHistoryAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_math_practice_history, parent, false)
-        return HistoryViewHolder(view)
+        return HistoryViewHolder(view, onSessionClick)
     }
     
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
@@ -79,7 +86,10 @@ class MathPracticeHistoryAdapter(
     
     override fun getItemCount(): Int = sessions.size
     
-    class HistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class HistoryViewHolder(
+        itemView: View,
+        private val onSessionClick: (MathPracticeSession) -> Unit
+    ) : RecyclerView.ViewHolder(itemView) {
         private val practiceTypeText: TextView = itemView.findViewById(R.id.practiceTypeText)
         private val timeText: TextView = itemView.findViewById(R.id.timeText)
         private val resultText: TextView = itemView.findViewById(R.id.resultText)
@@ -99,6 +109,11 @@ class MathPracticeHistoryAdapter(
             resultText.text = "正确: ${session.correctCount} / 错误: ${session.wrongCount}"
             dateText.text = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
                 .format(Date(session.startTime))
+            
+            // 点击项，跳转到详情页面
+            itemView.setOnClickListener {
+                onSessionClick(session)
+            }
         }
     }
 }

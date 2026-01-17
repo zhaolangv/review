@@ -122,6 +122,28 @@ class HandwritingInputView @JvmOverloads constructor(
         drawingPaint.strokeWidth = size
     }
 
+    // Pencil mode support: dynamic stroke width
+    private var isPencilModeEnabled = false
+    private var basePencilStrokeWidth = 6f
+    private var currentPencilStrokeWidth = 6f
+
+    private fun isTabletDevice(): Boolean {
+        val density = resources.displayMetrics.density
+        val widthDp = resources.displayMetrics.widthPixels / density
+        return widthDp >= 600f
+    }
+
+    fun setPencilModeEnabled(enabled: Boolean) {
+        isPencilModeEnabled = enabled
+        if (enabled) {
+            basePencilStrokeWidth = if (isTabletDevice()) 12f else 6f
+            currentPencilStrokeWidth = basePencilStrokeWidth
+            drawingPaint.strokeWidth = currentPencilStrokeWidth
+        } else {
+            currentPencilStrokeWidth = drawingPaint.strokeWidth
+        }
+    }
+
     /**
      * 清除所有内容（包括已识别的文字）
      */
@@ -236,7 +258,22 @@ class HandwritingInputView @JvmOverloads constructor(
                 val dx = abs(event.x - startX)
                 val dy = abs(event.y - startY)
                 
-                if (dx >= 4 || dy >= 4) {
+            if (dx >= 4 || dy >= 4) {
+                    // If pencil mode is on and using a stylus, adjust stroke width by pressure/tilt
+                    if (isPencilModeEnabled) {
+                        val toolType = event.getToolType(0)
+                        val isStylus = toolType == MotionEvent.TOOL_TYPE_STYLUS
+                        if (isStylus) {
+                            val p = event.pressure.coerceIn(0f, 1f)
+                            val tiltRaw = try { event.getAxisValue(MotionEvent.AXIS_TILT) } catch (e: Exception) { Float.NaN }
+                            val tilt = if (tiltRaw.isNaN()) 0f else tiltRaw
+                            val computed = (basePencilStrokeWidth * (0.5f + p * 1.5f)) * (1f + tilt * 0.2f)
+                            val width = computed.coerceIn(4f, 40f)
+                            drawingPaint.strokeWidth = width
+                        } else {
+                            // not a stylus, keep current width
+                        }
+                    }
                     currentPath?.quadTo(startX, startY, (event.x + startX) / 2, (event.y + startY) / 2)
                     
                     // 记录笔画点

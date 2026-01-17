@@ -10,93 +10,99 @@
     app:cardElevation="2dp"
     app:cardBackgroundColor="@android:color/white">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="16dp"
         android:background="@android:color/white">
 
-        <!-- 标签区域（顶部） -->
+        <!-- 选择框（批量模式时显示，左上角） -->
+        <CheckBox
+            android:id="@+id/selectionCheckBox"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="8dp" />
+
+        <!-- 标签区域（在复选框右侧） -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tagsRecyclerView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false"
+            app:layout_constraintStart_toEndOf="@id/selectionCheckBox"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:layout_marginBottom="8dp" />
 
         <!-- 提示（正面） -->
         <TextView
             android:id="@+id/frontText"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:textColor="#212121"
             android:textStyle="bold"
             android:maxLines="2"
             android:ellipsize="end"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tagsRecyclerView"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp" />
 
         <!-- 内容（背面） -->
         <TextView
             android:id="@+id/backText"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textColor="#757575"
             android:maxLines="2"
             android:ellipsize="end"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/frontText"
             android:layout_marginBottom="8dp" />
 
-        <!-- 底部信息行 -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- 间隔重复信息（左侧） -->
+        <TextView
+            android:id="@+id/reviewInfoText"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:textSize="11sp"
+            android:textColor="#9E9E9E"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/backText"
+            app:layout_constraintEnd_toStartOf="@id/gotoQuestionButton" />
 
-            <!-- 间隔重复信息（左侧） -->
-            <TextView
-                android:id="@+id/reviewInfoText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="11sp"
-                android:textColor="#9E9E9E" />
-
-            <!-- 跳转题目按钮 -->
-            <TextView
-                android:id="@+id/gotoQuestionButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="跳转题目"
-                android:textSize="12sp"
-                android:textColor="#2196F3"
-                android:background="?attr/selectableItemBackground"
-                android:padding="4dp"
-                android:layout_marginEnd="8dp"
-                android:visibility="gone" />
-
-            <!-- 时间（右侧） -->
-            <TextView
-                android:id="@+id/timeText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="11sp"
-                android:textColor="#9E9E9E" />
-
-        </LinearLayout>
-
-        <!-- 选择框（批量模式时显示，覆盖在左上角） -->
-        <CheckBox
-            android:id="@+id/selectionCheckBox"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+        <!-- 跳转题目按钮 -->
+        <TextView
+            android:id="@+id/gotoQuestionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="跳转题目"
+            android:textSize="12sp"
+            android:textColor="#2196F3"
+            android:background="?attr/selectableItemBackground"
+            android:padding="4dp"
             android:visibility="gone"
-            android:layout_gravity="top|start"
-            android:layout_marginTop="-16dp"
-            android:layout_marginStart="-16dp" />
+            app:layout_constraintEnd_toStartOf="@id/timeText"
+            app:layout_constraintTop_toBottomOf="@id/backText"
+            android:layout_marginEnd="8dp" />
 
-    </LinearLayout>
+        <!-- 时间（右侧） -->
+        <TextView
+            android:id="@+id/timeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="#9E9E9E"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/backText" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

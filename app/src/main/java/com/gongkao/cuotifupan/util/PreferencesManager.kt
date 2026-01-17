@@ -113,6 +113,20 @@ object PreferencesManager {
     }
     
     /**
+     * 保存卡片复习显示模式（true=翻转模式，false=上下模式）
+     */
+    fun saveFlashcardDisplayMode(context: Context, isFlipMode: Boolean) {
+        getPrefs(context).edit().putBoolean("flashcard_display_mode_flip", isFlipMode).apply()
+    }
+    
+    /**
+     * 获取卡片复习显示模式（默认true=翻转模式）
+     */
+    fun getFlashcardDisplayMode(context: Context): Boolean {
+        return getPrefs(context).getBoolean("flashcard_display_mode_flip", true)
+    }
+    
+    /**
      * 获取图片区域占总高度的比例（默认约0.714，即1.0/(1.0+0.4)）
      * @deprecated 使用 getImageHeightRatioForQuestion 代替，为每道题单独获取
      */

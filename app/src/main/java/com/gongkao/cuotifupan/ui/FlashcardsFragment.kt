@@ -100,6 +100,14 @@ class FlashcardsFragment : Fragment() {
         loadFlashcards()
     }
     
+    override fun onPause() {
+        super.onPause()
+        // 当Fragment失去焦点时（切换到其他页面），自动退出批量模式
+        if (isBatchMode) {
+            exitBatchMode()
+        }
+    }
+    
     private fun initViews() {
         recyclerView = view?.findViewById(R.id.recyclerView) ?: return
         emptyView = view?.findViewById(R.id.emptyView) ?: return
@@ -577,7 +585,12 @@ class FlashcardsFragment : Fragment() {
                 true
             }
             R.id.action_export -> {
-                exportFlashcards()
+                // 如果在批量模式下，导出选中的卡片；否则导出所有卡片
+                if (isBatchMode && selectedFlashcards.isNotEmpty()) {
+                    exportFlashcards(selectedFlashcards)
+                } else {
+                    exportFlashcards(null)
+                }
                 true
             }
             R.id.action_import -> {
@@ -623,21 +636,80 @@ class FlashcardsFragment : Fragment() {
         }
     }
     
-    private fun exportFlashcards() {
+    /**
+     * 导出记忆卡片（参考 Anki 风格，包含完整信息）
+     * @param selectedIds 如果指定，则只导出选中的卡片；否则导出所有卡片
+     */
+    private fun exportFlashcards(selectedIds: Set<String>? = null) {
         lifecycleScope.launch {
             val database = AppDatabase.getDatabase(requireContext())
-            val flashcards = database.standaloneFlashcardDao().getAllFlashcardsSync()
+            
+            // 获取要导出的卡片（选中的或全部的）
+            val flashcards = if (selectedIds != null && selectedIds.isNotEmpty()) {
+                withContext(Dispatchers.IO) {
+                    database.standaloneFlashcardDao().getAllFlashcardsSync()
+                        .filter { it.id in selectedIds }
+                }
+            } else {
+                withContext(Dispatchers.IO) {
+                    database.standaloneFlashcardDao().getAllFlashcardsSync()
+                }
+            }
             
             if (flashcards.isEmpty()) {
                 Toast.makeText(requireContext(), "没有可导出的记忆卡片", Toast.LENGTH_SHORT).show()
                 return@launch
             }
             
-            // 将记忆卡片转换为 JSON
+            // 获取所有卡包信息（用于构建层级路径）
+            val allDecks = withContext(Dispatchers.IO) {
+                database.flashcardDeckDao().getAllDecksSync()
+            }
+            val deckMap = allDecks.associateBy { it.id }
+            
+            /**
+             * 获取卡包的完整路径（如 "父卡包 > 子卡包 > 孙卡包"）
+             */
+            fun getDeckPath(deckId: String?): String? {
+                if (deckId == null) return null
+                val deck = deckMap[deckId] ?: return null
+                val pathParts = mutableListOf<String>()
+                var currentDeck: FlashcardDeck? = deck
+                
+                // 向上查找所有父卡包
+                while (currentDeck != null) {
+                    pathParts.add(0, currentDeck.name)
+                    val parentId = currentDeck.parentId
+                    currentDeck = if (parentId != null) deckMap[parentId] else null
+                }
+                
+                return if (pathParts.isEmpty()) null else pathParts.joinToString(" > ")
+            }
+            
+            // 收集所有涉及的卡包（用于导出卡包结构）
+            val involvedDeckIds = flashcards.mapNotNull { it.deckId }.toSet()
+            val involvedDecks = allDecks.filter { it.id in involvedDeckIds }
+            
+            // 构建卡包层级结构
+            val decksArray = JSONArray()
+            involvedDecks.forEach { deck ->
+                val deckObj = JSONObject().apply {
+                    put("id", deck.id)
+                    put("name", deck.name)
+                    put("parentId", deck.parentId ?: JSONObject.NULL)
+                    put("description", deck.description)
+                    put("createdAt", deck.createdAt)
+                    put("updatedAt", deck.updatedAt)
+                    put("sortOrder", deck.sortOrder)
+                }
+                decksArray.put(deckObj)
+            }
+            
+            // 将记忆卡片转换为 JSON（包含完整信息，参考 Anki）
             val jsonArray = JSONArray()
             flashcards.forEach { flashcard ->
                 val flashcardObj = JSONObject().apply {
-                    put("id", flashcard.id)
+                    put("id", flashcard.id) // 唯一标识（类似 Anki 的 GUID）
                     put("front", flashcard.front)
                     put("back", flashcard.back)
                     put("createdAt", flashcard.createdAt)
@@ -645,16 +717,29 @@ class FlashcardsFragment : Fragment() {
                     put("tags", flashcard.tags)
                     put("questionId", flashcard.questionId ?: JSONObject.NULL)
                     put("isFavorite", flashcard.isFavorite)
+                    // 复习进度信息（Anki 风格）
                     put("reviewState", flashcard.reviewState)
+                    put("nextReviewTime", flashcard.nextReviewTime)
+                    put("interval", flashcard.interval)
+                    put("easeFactor", flashcard.easeFactor)
+                    put("reviewCount", flashcard.reviewCount)
+                    put("consecutiveCorrect", flashcard.consecutiveCorrect)
+                    // 卡包信息（包含路径字符串，便于重建层级）
+                    put("deckId", flashcard.deckId ?: JSONObject.NULL)
+                    put("deckPath", getDeckPath(flashcard.deckId) ?: JSONObject.NULL)
+                    // 媒体文件路径（相对路径或文件名）
+                    put("frontImagePath", flashcard.frontImagePath ?: JSONObject.NULL)
+                    put("backImagePath", flashcard.backImagePath ?: JSONObject.NULL)
                 }
                 jsonArray.put(flashcardObj)
             }
             
             val exportData = JSONObject().apply {
-                put("version", 1)
+                put("version", 2) // 版本号升级，表示包含完整信息
                 put("type", "flashcards")
                 put("exportTime", System.currentTimeMillis())
                 put("count", flashcards.size)
+                put("decks", decksArray) // 卡包结构（层级信息）
                 put("flashcards", jsonArray)
             }
             
@@ -664,7 +749,12 @@ class FlashcardsFragment : Fragment() {
             }
             
             if (success) {
-                Toast.makeText(requireContext(), "成功导出 ${flashcards.size} 条记忆卡片到 Downloads 目录", Toast.LENGTH_LONG).show()
+                val message = if (selectedIds != null && selectedIds.isNotEmpty()) {
+                    "成功导出 ${flashcards.size} 条选中的记忆卡片到 Downloads 目录"
+                } else {
+                    "成功导出 ${flashcards.size} 条记忆卡片到 Downloads 目录"
+                }
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
             } else {
                 Toast.makeText(requireContext(), "导出失败，请检查存储权限", Toast.LENGTH_SHORT).show()
             }
@@ -744,9 +834,46 @@ class FlashcardsFragment : Fragment() {
     }
     
     /**
-     * 导入 JSON 格式（应用原有格式）
+     * 导入 JSON 格式（应用原有格式，参考 Anki 风格）
      */
     private fun importJsonFormat(content: String) {
+        // 显示导入选项对话框（参考 Anki 的导入选项）
+        // 简化实现：直接使用默认选项导入（类似 Anki 的默认导入）
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("导入选项")
+            .setMessage("导入时将：\n• 保留复习进度信息\n• 更新已有卡片（通过ID匹配）\n• 重建卡包层级结构")
+            .setPositiveButton("导入") { _, _ ->
+                // 使用默认选项进行导入
+                performJsonImport(content, includeReviewProgress = true, updateExisting = true)
+            }
+            .setNegativeButton("取消", null)
+            .show()
+    }
+    
+    /**
+     * 获取卡包的完整路径（辅助函数）
+     */
+    private fun getDeckPath(deck: FlashcardDeck, allDecks: List<FlashcardDeck>): String {
+        val deckMap = allDecks.associateBy { it.id }
+        val pathParts = mutableListOf<String>()
+        var currentDeck: FlashcardDeck? = deck
+        
+        while (currentDeck != null) {
+            pathParts.add(0, currentDeck.name)
+            val parentId = currentDeck.parentId
+            currentDeck = if (parentId != null) deckMap[parentId] else null
+        }
+        
+        return pathParts.joinToString(" > ")
+    }
+    
+    /**
+     * 执行 JSON 导入（参考 Anki 风格，支持选项）
+     * @param content JSON 内容
+     * @param includeReviewProgress 是否包含复习进度（类似 Anki 的 "Allow HTML in fields" 等选项）
+     * @param updateExisting 是否更新已有卡片（通过 ID 判断，类似 Anki 的 GUID 机制）
+     */
+    private fun performJsonImport(content: String, includeReviewProgress: Boolean = true, updateExisting: Boolean = true) {
         lifecycleScope.launch {
             try {
                 val jsonObj = JSONObject(content)
@@ -758,44 +885,141 @@ class FlashcardsFragment : Fragment() {
                     return@launch
                 }
                 
-                val flashcardsArray = jsonObj.getJSONArray("flashcards")
                 val database = AppDatabase.getDatabase(requireContext())
                 
+                // 获取所有现有卡包（用于重建层级）
+                val existingDecks = withContext(Dispatchers.IO) {
+                    database.flashcardDeckDao().getAllDecksSync()
+                }
+                val existingDeckMap = existingDecks.associateBy { it.id }
+                
+                // 导入卡包结构（如果导出的文件包含卡包信息）
+                val deckIdMapping = mutableMapOf<String, String>() // 旧ID -> 新ID映射
+                if (jsonObj.has("decks") && version >= 2) {
+                    val decksArray = jsonObj.getJSONArray("decks")
+                    withContext(Dispatchers.IO) {
+                        // 按层级顺序导入卡包（先导入父卡包）
+                        val allImportedDecks = mutableListOf<Pair<FlashcardDeck, String?>>() // (deck, parentId)
+                        for (i in 0 until decksArray.length()) {
+                            val deckObj = decksArray.getJSONObject(i)
+                            val oldId = deckObj.getString("id")
+                            val deckPath = if (deckObj.has("deckPath") && !deckObj.isNull("deckPath")) {
+                                deckObj.getString("deckPath")
+                            } else {
+                                null
+                            }
+                            
+                            // 检查是否已存在相同名称和层级的卡包
+                            val existingDeck = if (deckPath != null) {
+                                // 通过路径查找
+                                existingDecks.find { existingDeck ->
+                                    getDeckPath(existingDeck, existingDecks) == deckPath
+                                }
+                            } else {
+                                existingDecks.find { it.name == deckObj.getString("name") && it.parentId == null }
+                            }
+                            
+                            if (existingDeck != null) {
+                                // 已存在，使用现有ID
+                                deckIdMapping[oldId] = existingDeck.id
+                            } else {
+                                // 需要创建新卡包
+                                val oldParentId = if (deckObj.isNull("parentId")) null else deckObj.getString("parentId")
+                                val parentId = oldParentId?.let { deckIdMapping[it] } // 使用映射后的父ID
+                                val newDeck = FlashcardDeck(
+                                    id = UUID.randomUUID().toString(),
+                                    name = deckObj.getString("name"),
+                                    parentId = parentId,
+                                    description = deckObj.optString("description", ""),
+                                    createdAt = deckObj.optLong("createdAt", System.currentTimeMillis()),
+                                    updatedAt = deckObj.optLong("updatedAt", System.currentTimeMillis()),
+                                    sortOrder = deckObj.optInt("sortOrder", 0)
+                                )
+                                database.flashcardDeckDao().insert(newDeck)
+                                deckIdMapping[oldId] = newDeck.id
+                                allImportedDecks.add(Pair(newDeck, oldParentId))
+                            }
+                        }
+                    }
+                }
+                
+                val flashcardsArray = jsonObj.getJSONArray("flashcards")
                 var successCount = 0
+                var updateCount = 0
                 var skipCount = 0
                 
                 withContext(Dispatchers.IO) {
                     for (i in 0 until flashcardsArray.length()) {
                         val flashcardObj = flashcardsArray.getJSONObject(i)
+                        val flashcardId = flashcardObj.optString("id", UUID.randomUUID().toString())
+                        
+                        // 处理卡包ID（使用映射后的ID）
+                        val oldDeckId = if (flashcardObj.isNull("deckId")) null else flashcardObj.optString("deckId")
+                        val newDeckId = if (oldDeckId != null) {
+                            deckIdMapping[oldDeckId] ?: run {
+                                // 如果找不到映射，尝试通过路径查找
+                                if (flashcardObj.has("deckPath") && !flashcardObj.isNull("deckPath")) {
+                                    val deckPath = flashcardObj.getString("deckPath")
+                                    existingDecks.find { getDeckPath(it, existingDecks) == deckPath }?.id
+                                } else {
+                                    null
+                                }
+                            }
+                        } else {
+                            null
+                        }
+                        
                         val flashcard = StandaloneFlashcard(
-                            id = flashcardObj.optString("id", UUID.randomUUID().toString()),
+                            id = flashcardId, // 保留原ID（类似 Anki 的 GUID）
                             front = flashcardObj.getString("front"),
                             back = flashcardObj.getString("back"),
                             createdAt = flashcardObj.optLong("createdAt", System.currentTimeMillis()),
                             updatedAt = flashcardObj.optLong("updatedAt", System.currentTimeMillis()),
                             tags = flashcardObj.optString("tags", ""),
-                            deckId = if (flashcardObj.isNull("deckId")) null else flashcardObj.optString("deckId"),
+                            deckId = newDeckId,
                             questionId = if (flashcardObj.isNull("questionId")) null else flashcardObj.optString("questionId"),
                             isFavorite = flashcardObj.optBoolean("isFavorite", false),
-                            reviewState = flashcardObj.optString("reviewState", "new")
+                            // 根据选项决定是否导入复习进度
+                            reviewState = if (includeReviewProgress) flashcardObj.optString("reviewState", "new") else "new",
+                            nextReviewTime = if (includeReviewProgress) flashcardObj.optLong("nextReviewTime", 0L) else 0L,
+                            interval = if (includeReviewProgress) flashcardObj.optLong("interval", 0L) else 0L,
+                            easeFactor = if (includeReviewProgress) flashcardObj.optDouble("easeFactor", 2.5) else 2.5,
+                            reviewCount = if (includeReviewProgress) flashcardObj.optInt("reviewCount", 0) else 0,
+                            consecutiveCorrect = if (includeReviewProgress) flashcardObj.optInt("consecutiveCorrect", 0) else 0,
+                            // 媒体文件路径（需要根据实际情况处理）
+                            frontImagePath = if (flashcardObj.isNull("frontImagePath")) null else flashcardObj.optString("frontImagePath"),
+                            backImagePath = if (flashcardObj.isNull("backImagePath")) null else flashcardObj.optString("backImagePath")
                         )
                         
-                        // 检查是否已存在
+                        // 检查是否已存在（通过ID判断，类似 Anki 的 GUID 机制）
                         val existing = database.standaloneFlashcardDao().getFlashcardById(flashcard.id)
                         if (existing == null) {
+                            // 不存在，插入新卡片
                             database.standaloneFlashcardDao().insert(flashcard)
                             successCount++
+                        } else if (updateExisting) {
+                            // 已存在且允许更新，更新卡片
+                            database.standaloneFlashcardDao().update(flashcard)
+                            updateCount++
                         } else {
+                            // 已存在但不更新，跳过
                             skipCount++
                         }
                     }
                 }
                 
-                val message = when {
-                    skipCount > 0 -> "成功导入 $successCount 条记忆卡片，跳过 $skipCount 条重复卡片"
-                    else -> "成功导入 $successCount 条记忆卡片"
+                val message = buildString {
+                    if (successCount > 0) append("新增 $successCount 条")
+                    if (updateCount > 0) {
+                        if (isNotEmpty()) append("，")
+                        append("更新 $updateCount 条")
+                    }
+                    if (skipCount > 0) {
+                        if (isNotEmpty()) append("，")
+                        append("跳过 $skipCount 条重复")
+                    }
                 }
-                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "导入完成：$message", Toast.LENGTH_LONG).show()
                 
                 // 刷新列表
                 loadFlashcards()

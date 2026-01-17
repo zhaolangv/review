@@ -81,6 +81,32 @@ interface StandaloneFlashcardDao {
     @Query("SELECT * FROM standalone_flashcards WHERE deckId = :deckId ORDER BY updatedAt DESC")
     fun getFlashcardsByDeckLive(deckId: String): LiveData<List<StandaloneFlashcard>>
     
+    /**
+     * 获取指定卡包的今日需要复习的卡片（包含该卡包及其所有子卡包的卡片）
+     * @param deckIds 卡包 ID 列表（包含父卡包和所有子卡包）
+     * @param currentTime 当前时间
+     */
+    @Query("SELECT * FROM standalone_flashcards WHERE deckId IN (:deckIds) AND (reviewState IN ('new', 'learning') OR (reviewState IN ('review', 'relearning') AND nextReviewTime <= :currentTime)) ORDER BY nextReviewTime ASC, createdAt ASC")
+    suspend fun getDueCardsByDeckIds(deckIds: List<String>, currentTime: Long = System.currentTimeMillis()): List<StandaloneFlashcard>
+    
+    /**
+     * 获取指定卡包的新卡片数量（包含所有子卡包）
+     */
+    @Query("SELECT COUNT(*) FROM standalone_flashcards WHERE deckId IN (:deckIds) AND reviewState = 'new'")
+    suspend fun getNewCardCountByDeckIds(deckIds: List<String>): Int
+    
+    /**
+     * 获取指定卡包的学习卡片数量（包含所有子卡包）
+     */
+    @Query("SELECT COUNT(*) FROM standalone_flashcards WHERE deckId IN (:deckIds) AND reviewState = 'learning'")
+    suspend fun getLearningCardCountByDeckIds(deckIds: List<String>): Int
+    
+    /**
+     * 获取指定卡包的复习卡片数量（包含所有子卡包）
+     */
+    @Query("SELECT COUNT(*) FROM standalone_flashcards WHERE deckId IN (:deckIds) AND reviewState IN ('review', 'relearning') AND nextReviewTime <= :currentTime")
+    suspend fun getDueReviewCardCountByDeckIds(deckIds: List<String>, currentTime: Long = System.currentTimeMillis()): Int
+    
     @Query("DELETE FROM standalone_flashcards")
     suspend fun deleteAll()
 }

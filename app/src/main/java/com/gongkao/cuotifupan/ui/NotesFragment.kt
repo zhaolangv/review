@@ -678,6 +678,14 @@ class NotesFragment : Fragment() {
         loadNotes()
     }
     
+    override fun onPause() {
+        super.onPause()
+        // 当Fragment失去焦点时（切换到其他页面），自动退出批量模式
+        if (isBatchMode) {
+            exitBatchMode()
+        }
+    }
+    
     private fun showNoteContentDialog(note: StandaloneNote) {
         AlertDialog.Builder(requireContext())
             .setTitle("笔记内容")

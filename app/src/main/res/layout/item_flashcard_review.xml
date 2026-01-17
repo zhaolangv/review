@@ -19,7 +19,9 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:fillViewport="true"
+            android:clickable="false"
+            android:focusable="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -28,7 +30,9 @@
                 android:padding="32dp"
                 android:gravity="center"
                 android:minHeight="300dp"
-                android:layout_gravity="center">
+                android:layout_gravity="center"
+                android:clickable="false"
+                android:focusable="false">
 
                 <TextView
                     android:id="@+id/flashcardFrontText"
@@ -44,6 +48,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:maxHeight="400dp"
                     android:scaleType="fitCenter"
                     android:adjustViewBounds="true"
                     android:visibility="gone"
@@ -68,7 +73,9 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:fillViewport="true"
+            android:clickable="false"
+            android:focusable="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -77,7 +84,9 @@
                 android:padding="32dp"
                 android:gravity="center"
                 android:minHeight="300dp"
-                android:layout_gravity="center">
+                android:layout_gravity="center"
+                android:clickable="false"
+                android:focusable="false">
 
                 <TextView
                     android:id="@+id/flashcardBackText"
@@ -93,6 +102,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:maxHeight="400dp"
                     android:scaleType="fitCenter"
                     android:adjustViewBounds="true"
                     android:visibility="gone"

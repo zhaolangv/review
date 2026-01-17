@@ -65,6 +65,9 @@ class MathPracticeActivity : AppCompatActivity() {
     private var elapsedSeconds: Int = 0
     private var currentSessionId: String? = null
     
+    // 答题模式：true=全部做完后显示答案，false=每做一道就显示答案
+    private var showAfterAll: Boolean = true
+    
     // 当前选中的比较选项或选项
     private var selectedComparison: String? = null  // "greater" 或 "less"
     private var selectedOption: String? = null  // "A" 或 "B"
@@ -87,7 +90,8 @@ class MathPracticeActivity : AppCompatActivity() {
             
             val typeName = intent.getStringExtra("practice_type")
             val questionCount = intent.getIntExtra("question_count", 10)
-            android.util.Log.d("MathPracticeActivity", "接收参数: type=$typeName, count=$questionCount")
+            showAfterAll = intent.getBooleanExtra("show_after_all", true)
+            android.util.Log.d("MathPracticeActivity", "接收参数: type=$typeName, count=$questionCount, showAfterAll=$showAfterAll")
             
             practiceType = PracticeType.valueOf(typeName ?: PracticeType.TWO_DIGIT_ADD_SUB.name)
             android.util.Log.d("MathPracticeActivity", "准备生成题目，类型: ${practiceType!!.name} (${practiceType!!.displayName}), 数量: $questionCount")
@@ -544,7 +548,7 @@ class MathPracticeActivity : AppCompatActivity() {
             keyboardContainer.addView(rowLayout)
         }
         
-        // 添加底部行：小数点、0、确定
+        // 添加底部行：负号、小数点、0
         val bottomRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(
@@ -553,7 +557,7 @@ class MathPracticeActivity : AppCompatActivity() {
             )
         }
         
-        listOf(".", "0").forEach { char ->
+        listOf("-", ".", "0").forEach { char ->
             val button = Button(this).apply {
                 text = char
                 layoutParams = LinearLayout.LayoutParams(
@@ -575,7 +579,18 @@ class MathPracticeActivity : AppCompatActivity() {
                     answerInput.clearFocus()
                     
                     val current = answerInput.text.toString()
-                    answerInput.setText(current + char)
+                    if (char == "-") {
+                        // 负号只能放在开头，且只能有一个
+                        if (current.startsWith("-")) {
+                            // 如果已经有负号，则移除负号
+                            answerInput.setText(current.removePrefix("-"))
+                        } else {
+                            // 如果没有负号，则添加负号到开头
+                            answerInput.setText("-$current")
+                        }
+                    } else {
+                        answerInput.setText(current + char)
+                    }
                     // 添加点击反馈
                     android.util.Log.d("MathPracticeActivity", "数字按钮被点击: $char")
                 }
@@ -780,17 +795,25 @@ class MathPracticeActivity : AppCompatActivity() {
         val isCorrect = userAnswer != null && isAnswerCorrect(currentQuestion.answer, userAnswer, currentQuestion.practiceType)
         userAnswers.add(Pair(currentQuestion, userAnswer))
         
-        // 立即显示对错提示
-        val message = if (isCorrect) "✓ 正确" else "✗ 错误"
-        val bgColor = if (isCorrect) android.graphics.Color.parseColor("#4CAF50") else android.graphics.Color.parseColor("#F44336")
-        
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        
-        // 延迟一下再进入下一题，让用户看到对错提示
-        Handler(Looper.getMainLooper()).postDelayed({
+        if (showAfterAll) {
+            // 全部做完后显示答案模式：不显示对错提示，直接进入下一题
             currentQuestionIndex++
             showCurrentQuestion()
-        }, 800)  // 延迟800ms
+        } else {
+            // 每做一道就显示答案模式：立即显示对错提示和答案
+            val message = if (isCorrect) {
+                "✓ 正确\n正确答案：${formatAnswer(currentQuestion.answer, currentQuestion.practiceType)}"
+            } else {
+                "✗ 错误\n正确答案：${formatAnswer(currentQuestion.answer, currentQuestion.practiceType)}"
+            }
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+            
+            // 延迟一下再进入下一题，让用户看到对错提示
+            Handler(Looper.getMainLooper()).postDelayed({
+                currentQuestionIndex++
+                showCurrentQuestion()
+            }, 2000)  // 延迟2秒，让用户有时间看答案
+        }
     }
     
     private fun finishPractice() {
@@ -839,6 +862,25 @@ class MathPracticeActivity : AppCompatActivity() {
                 }
                 startActivity(intent)
                 finish()
+            }
+        }
+    }
+    
+    private fun formatAnswer(answer: Double, type: PracticeType): String {
+        return when (type) {
+            PracticeType.FRACTION_COMPARE,
+            PracticeType.INCREMENT_COMPARE,
+            PracticeType.BASE_PERIOD_COMPARE -> {
+                if (answer > 0) "大于" else "小于"
+            }
+            else -> {
+                // 如果是整数，不显示小数点
+                if (answer == answer.toInt().toDouble()) {
+                    answer.toInt().toString()
+                } else {
+                    // 保留2位小数
+                    String.format("%.2f", answer)
+                }
             }
         }
     }

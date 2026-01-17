@@ -80,16 +80,32 @@ class MathPracticeResultActivity : AppCompatActivity() {
                     val seconds = session.totalTimeSeconds % 60
                     timeText.text = "本次练习用时${hours}:${String.format("%02d", minutes)}:${String.format("%02d", seconds)}加油"
                     
-                    val questions = JSONArray(session.questionsData)
+                    // 检查 questionsData 是否为空或无效
+                    val questionsData = session.questionsData
                     val results = mutableListOf<QuestionResult>()
-                    for (i in 0 until questions.length()) {
-                        val q = questions.getJSONObject(i)
-                        results.add(QuestionResult(
-                            question = q.getString("question"),
-                            correctAnswer = q.getDouble("correctAnswer"),
-                            userAnswer = q.optString("userAnswer", "").toDoubleOrNull(),
-                            isCorrect = q.getBoolean("isCorrect")
-                        ))
+                    
+                    if (questionsData.isNotEmpty()) {
+                        try {
+                            val questions = JSONArray(questionsData)
+                            for (i in 0 until questions.length()) {
+                                val q = questions.getJSONObject(i)
+                                results.add(QuestionResult(
+                                    question = q.getString("question"),
+                                    correctAnswer = q.getDouble("correctAnswer"),
+                                    userAnswer = q.optString("userAnswer", "").toDoubleOrNull(),
+                                    isCorrect = q.getBoolean("isCorrect")
+                                ))
+                            }
+                        } catch (e: Exception) {
+                            // JSON 解析失败，可能是不兼容的旧数据格式
+                            android.util.Log.e("MathPracticeResultActivity", "解析题目数据失败", e)
+                            // 显示空列表，或者显示错误提示
+                            timeText.text = "本次练习用时${hours}:${String.format("%02d", minutes)}:${String.format("%02d", seconds)}\n（题目详情数据不可用）"
+                        }
+                    } else {
+                        // questionsData 为空，可能是旧版本的数据
+                        android.util.Log.w("MathPracticeResultActivity", "questionsData 为空，无法显示题目详情")
+                        timeText.text = "本次练习用时${hours}:${String.format("%02d", minutes)}:${String.format("%02d", seconds)}\n（题目详情数据不可用）"
                     }
                     
                     resultRecyclerView.adapter = MathPracticeResultAdapter(results)
